@@ -1,0 +1,23 @@
+<Project Sdk="Microsoft.NET.Sdk.Razor">
+    <PropertyGroup>
+        <TargetFrameworks>net6.0</TargetFrameworks>
+        <Nullable>enable</Nullable>
+        <ImplicitUsings>enable</ImplicitUsings>
+    </PropertyGroup>
+
+    <PropertyGroup>
+        <Version>6.2.0</Version>
+        <PackageProjectUrl>https://github.com/densen2014/BootstrapBlazor.WebAPI</PackageProjectUrl>
+        <RepositoryUrl>https://github.com/densen2014/BootstrapBlazor.WebAPI</RepositoryUrl>
+        <RepositoryType>git</RepositoryType>
+        <PackageTags>Bootstrap Blazor WebAPI 组件 (电池信息/网络信息)</PackageTags>
+        <Description>Bootstrap UI WebAPI components experience (Battery info/Network info)</Description>
+        <AssemblyName>BootstrapBlazor.WebAPI</AssemblyName>
+        <RootNamespace>BootstrapBlazor.WebAPI</RootNamespace>
+        <AssemblyOriginatorKeyFile>..\keys\Longbow.Utility.snk</AssemblyOriginatorKeyFile>
+    </PropertyGroup>
+    
+    <ItemGroup>
+        <PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="6.0.0" />
+    </ItemGroup>
+</Project>
