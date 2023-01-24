@@ -1,0 +1,32 @@
+﻿// ********************************** 
+// Densen Informatica 中讯科技 
+// 作者：Alex Chow
+// e-mail:zhouchuanglin@gmail.com 
+// **********************************
+
+
+using System.ComponentModel;
+
+namespace BootstrapBlazor.Components;
+
+/// <summary>
+/// 截屏
+/// </summary>
+public class CaptureOptions
+{
+
+    /// <summary>
+    /// 持续获取截图
+    /// </summary>
+    /// <returns></returns>
+    [DisplayName("持续获取截图")]
+    public bool Continuous { get; set; }
+
+    /// <summary>
+    /// 使用摄像头,否则使用屏幕. 默认为 true
+    /// </summary>
+    /// <returns></returns>
+    [DisplayName("使用摄像头")]
+    public bool Camera { get; set; } = true; 
+
+}

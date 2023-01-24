@@ -24,7 +24,7 @@ public partial class WebApi : IAsyncDisposable
         {
             if (firstRender)
             {
-                module = await JS!.InvokeAsync<IJSObjectReference>("import", "./_content/BootstrapBlazor.WebAPI/lib/webapi/webapi.js");
+                module = await JS!.InvokeAsync<IJSObjectReference>("import", "./_content/BootstrapBlazor.WebAPI/app.js");
                 InstanceWebApi = DotNetObjectReference.Create(this);
                 if (OnBatteryResult != null) await GetBattery();
                 if (OnNetworkInfoResult != null) await GetNetworkInfo();

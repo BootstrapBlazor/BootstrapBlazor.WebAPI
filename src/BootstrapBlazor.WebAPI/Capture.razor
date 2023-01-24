@@ -1,0 +1,23 @@
+﻿@namespace BootstrapBlazor.Components
+
+@if (ShowUI)
+{
+    <div @ref="Element">
+
+        <div data-action="camera" class="camera">
+            <video data-action="video" class="video">Video stream not available.</video>
+            <button data-action="startbutton" class="startbutton">@CaptureBtnTitle</button>
+        </div>
+
+        <canvas data-action="canvas" class="canvas"> </canvas>
+
+        <div class="output">
+            <img data-action="photo" class="photo" alt="屏幕截图结果." />
+        </div>
+
+    </div>
+}
+@if (Debug)
+{
+    <pre data-action="log" class="photo"></pre>
+}
