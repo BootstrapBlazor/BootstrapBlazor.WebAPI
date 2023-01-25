@@ -5,6 +5,7 @@
 // **********************************
 
 
+using Microsoft.AspNetCore.Components;
 using System.ComponentModel;
 
 namespace BootstrapBlazor.Components;
@@ -27,6 +28,12 @@ public class CaptureOptions
     /// </summary>
     /// <returns></returns>
     [DisplayName("使用摄像头")]
-    public bool Camera { get; set; } = true; 
+    public bool Camera { get; set; } = true;
+
+    /// <summary>
+    /// 显示log
+    /// </summary>
+    [DisplayName("显示log")]
+    public bool Debug { get; set; }
 
 }

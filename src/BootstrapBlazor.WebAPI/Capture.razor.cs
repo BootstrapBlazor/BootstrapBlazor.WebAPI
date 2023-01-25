@@ -71,6 +71,11 @@ public partial class Capture : IAsyncDisposable
     [Parameter]
     public bool Debug { get; set; }
 
+    /// <summary>
+    /// 选择设备按钮文本/Select device button title
+    /// </summary>
+    [Parameter]
+    public string SelectDeviceBtnTitle { get; set; } = "选择设备";
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -101,19 +106,20 @@ public partial class Capture : IAsyncDisposable
     /// <summary>
     /// 截屏
     /// </summary>
-    public virtual async Task Start() =>await Start(null, null);
+    public virtual async Task Start() =>await Start(null, null, null);
 
 
     /// <summary>
     /// 截屏
     /// </summary>
-    public virtual async Task Start(bool? continuous, bool? camera)
+    public virtual async Task Start(bool? continuous, bool? camera, bool? debug)
     {
         try
         {
             Options = Options?? new CaptureOptions();
             Options.Continuous = continuous??Continuous;
             Options.Camera = camera??Camera;
+            Options.Debug = debug ?? Debug;
             await module!.InvokeVoidAsync("Capture", Instance, Element, Options, "Start");
         }
         catch (Exception e)

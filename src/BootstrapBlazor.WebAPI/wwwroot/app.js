@@ -96,7 +96,10 @@ export async function Capture(instance, element, options, command) {
     let canvas = null;
     let photo = null;
     let startbutton = null;
-    let sendTimer;
+    let sendTimer = null;
+    let sourceSelect = null;
+    let sourceSelectPanel = null;
+    let selectedDeviceId = null;
 
     if (command == 'Start') {
         startup();
@@ -123,6 +126,8 @@ export async function Capture(instance, element, options, command) {
         canvas = element.querySelector("[data-action=canvas]");
         photo = element.querySelector("[data-action=photo]");
         startbutton = element.querySelector("[data-action=startbutton]");
+        sourceSelect = element.querySelector("[data-action=sourceSelect]");
+        sourceSelectPanel = element.querySelector("[data-action=sourceSelectPanel]");
 
         if (!options.camera && navigator.mediaDevices && navigator.mediaDevices.getDisplayMedia) {
             navigator.mediaDevices
@@ -136,8 +141,45 @@ export async function Capture(instance, element, options, command) {
                     instance.invokeMethodAsync('GetError', `An error occurred: ${err}`);
                 });
         }else if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+
+            if (!navigator.mediaDevices?.enumerateDevices) {
+                console.log("enumerateDevices() not supported.");
+            } else if (selectedDeviceId==null) {
+                navigator.mediaDevices.enumerateDevices()
+                    .then((devices) => {
+                        devices.forEach((device) => {
+                            if (device.kind === 'videoinput') {
+                                if (options.debug) console.log(`${device.label} id = ${device.deviceId}`);
+                                const sourceOption = document.createElement('option');
+                                sourceOption.text = device.label
+                                sourceOption.value = device.deviceId
+                                sourceSelect.appendChild(sourceOption)
+                                selectedDeviceId = device.deviceId;
+                            }
+                        });
+
+                        sourceSelect.onchange = () => {
+                            selectedDeviceId = sourceSelect.value;
+                            if (options.debug) console.log(`selectedDevice: ${sourceSelect.options[sourceSelect.selectedIndex].text} id = ${sourceSelect.value}`);
+                            startup();
+                        }
+
+                        sourceSelectPanel.style.display = 'block'
+
+                    })
+                    .catch((err) => {
+                        console.error(`${err.name}: ${err.message}`);
+                    });
+            }
+
+            if (window.stream) {
+                window.stream.getTracks().forEach(track => {
+                    track.stop();
+                });
+            }
+
             navigator.mediaDevices
-                .getUserMedia({ video: true, audio: false })
+                .getUserMedia({ video: { deviceId: selectedDeviceId ? { exact: selectedDeviceId } : undefined }, audio: false })
                 .then((stream) => {
                     video.srcObject = stream;
                     video.play();
