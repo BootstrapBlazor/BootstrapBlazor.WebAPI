@@ -84,7 +84,6 @@ export function GetNetworkInfo(wrapper) {
     logNetworkInfo();
 }
 
-
 export async function Capture(instance, element, options, command) {
 
     const width = 500;  
@@ -261,4 +260,9 @@ export async function Capture(instance, element, options, command) {
     }
 
     return true;
+}
+
+export async function getUserAgent() {
+    console.log(navigator.userAgent);
+    return navigator.userAgent;
 }

@@ -6,11 +6,11 @@
     </PropertyGroup>
 
     <PropertyGroup>
-        <Version>7.0.2</Version>
+        <Version>7.0.3</Version>
         <PackageProjectUrl>https://github.com/densen2014/BootstrapBlazor.WebAPI</PackageProjectUrl>
         <RepositoryUrl>https://github.com/densen2014/BootstrapBlazor.WebAPI</RepositoryUrl>
         <RepositoryType>git</RepositoryType>
-        <PackageTags>Bootstrap Blazor WebAPI 组件 (电池信息/网络信息/截屏/录像)</PackageTags>
+        <PackageTags>Bootstrap Blazor WebAPI 组件 (浏览器信息/电池信息/网络信息/截屏/录像)</PackageTags>
         <Description>Bootstrap UI WebAPI components experience (Battery info/Network info)</Description>
         <AssemblyName>BootstrapBlazor.WebAPI</AssemblyName>
         <RootNamespace>BootstrapBlazor.WebAPI</RootNamespace>
@@ -26,6 +26,10 @@
         <PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="7.0" />
     </ItemGroup>
     
+    <ItemGroup>
+        <PackageReference Include="UAParser" Version="3.1.47" />
+    </ItemGroup>
+
     <!-- 通过移除正常的引用并替换成固定版本的引用，达到无论如何更新都无法生效的目的。 -->
     <Target Condition="'$(TargetFramework)' == 'net6.0'" Name="ReferenceStaticLegacyPackage" BeforeTargets="CollectPackageReferences">
         <ItemGroup>

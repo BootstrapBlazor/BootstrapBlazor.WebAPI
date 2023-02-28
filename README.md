@@ -1,12 +1,16 @@
-# Blazor WebAPI 组件 (电池信息/网络信息)
+# Blazor WebAPI 组件 (浏览器信息/电池信息/网络信息/截屏/录像)
 
 1. 电池信息类
 2. 网络信息类
+3. 浏览器信息类
+4. 截屏类
 
 
 示例:
 
 https://blazor.app1.es/WebAPI
+
+https://blazor.app1.es/screencapture
 
 使用方法:
 
@@ -21,19 +25,50 @@ https://blazor.app1.es/WebAPI
 
 3.razor页面
 ```
-<WebApi OnError="@OnError" />
+<WebApi OnBatteryResult="@OnBatteryResult" OnNetworkInfoResult="@OnNetworkInfoResult" OnUserAgentResult="OnUserAgentResult" OnError="@OnError" ShowInfo />
+
+<Capture OnCaptureResult="@OnCaptureResult" OnError="@OnError" Camera="false" />
+
 
 ```
 ```
 @code{
 
-    private string message;
+    private Task OnBatteryResult(BatteryStatus item)
+    {
+        xx = item;
+        StateHasChanged();
+        return Task.CompletedTask;
+    }
+
+    private Task OnNetworkInfoResult(NetworkInfoStatus item)
+    {
+        xx = item;
+        StateHasChanged();
+        return Task.CompletedTask;
+    }
+
+    private Task OnUserAgentResult(UAInfo item)
+    {
+        xx = item;
+        StateHasChanged();
+        return Task.CompletedTask;
+    }
 
     private Task OnError(string message)
     {
         this.message = message;
         StateHasChanged();
         return Task.CompletedTask;
+    }
+
+    //OCR库
+    private OCR? OCR { get; set; } 
+
+    private async Task OnCaptureResult(Stream item)
+    {
+        if (OCR!=null) await OCR.OCRFromStream(item);
+        StateHasChanged();
     }
 
 } 
