@@ -110,6 +110,11 @@ public partial class Capture : IAsyncDisposable
         }
     }
 
+    public async Task Dispose()
+    {
+        await module!.InvokeVoidAsync("Capture", Instance, Element, Options, "Destroy");
+    }
+
     async ValueTask IAsyncDisposable.DisposeAsync()
     {
         await module!.InvokeVoidAsync("Capture", Instance, Element, Options, "Destroy");
