@@ -5,7 +5,6 @@
 // **********************************
 
 using Microsoft.AspNetCore.Components;
-using Microsoft.Extensions.Options;
 using Microsoft.JSInterop;
 using System.Diagnostics.CodeAnalysis;
 using System.Text.RegularExpressions;
@@ -41,11 +40,17 @@ public partial class Capture : IAsyncDisposable
     public Func<Stream, Task>? OnCaptureResult { get; set; }
 
     /// <summary>
+    /// 获得/设置 截屏base64回调方法
+    /// </summary>
+    [Parameter]
+    public Func<string, Task>? OnCapture { get; set; }
+
+    /// <summary>
     /// 截图按钮文本/Capture button title
     /// </summary>
     [Parameter]
     [NotNull]
-    public string? CaptureBtnTitle { get; set; } = "截图";
+    public string? CaptureBtnTitle { get; set; }
 
     /// <summary>
     /// 获得/设置 持续获取截图
@@ -64,6 +69,12 @@ public partial class Capture : IAsyncDisposable
     /// </summary>
     [Parameter]
     public bool ShowUI { get; set; } = true;
+    
+    /// <summary>
+    /// 获得/设置 显示结果
+    /// </summary>
+    [Parameter]
+    public bool ShowResult { get; set; } = true;
 
     /// <summary>
     /// 获得/设置 显示log
@@ -76,6 +87,11 @@ public partial class Capture : IAsyncDisposable
     /// </summary>
     [Parameter]
     public string SelectDeviceBtnTitle { get; set; } = "选择设备";
+
+    protected override void OnInitialized()
+    {
+        CaptureBtnTitle= CaptureBtnTitle?? (Camera?"拍照":"截屏");
+    }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -96,6 +112,7 @@ public partial class Capture : IAsyncDisposable
 
     async ValueTask IAsyncDisposable.DisposeAsync()
     {
+        await module!.InvokeVoidAsync("Capture", Instance, Element, Options, "Destroy");
         Instance?.Dispose();
         if (module is not null)
         {
@@ -141,6 +158,10 @@ public partial class Capture : IAsyncDisposable
             if (OnCaptureResult != null)
             {
                 await OnCaptureResult.Invoke(DataUrl2Stream(base64encodedstring));
+            }
+            if (OnCapture != null)
+            {
+                await OnCapture.Invoke(base64encodedstring);
             }
         }
         catch (Exception e)

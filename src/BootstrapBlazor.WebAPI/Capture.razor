@@ -16,12 +16,14 @@
         </div>
 
         <canvas data-action="canvas" class="canvas"> </canvas>
+        @if (ShowResult)
+        {
 
-        <div class="output">
-            <img data-action="photo" class="photo" alt="屏幕截图结果." />
+            <div class="output">
+                <img data-action="photo" class="photo" alt="屏幕截图结果." />
+            </div>
+        }
         </div>
-
-    </div>
 }
 @if (Debug)
 {

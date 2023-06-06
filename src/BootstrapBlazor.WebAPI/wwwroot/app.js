@@ -103,6 +103,10 @@ export async function Capture(instance, element, options, command) {
     if (command == 'Start') {
         startup();
     }
+    if (command == 'Destroy') {
+        destroy();
+        return;
+    }
 
     function showViewLiveResultButton() {
         if (window.self !== window.top) {
@@ -171,8 +175,8 @@ export async function Capture(instance, element, options, command) {
                     });
             }
 
-            if (window.stream) {
-                window.stream.getTracks().forEach(track => {
+            if (video.srcObject) {
+                video.srcObject.getTracks().forEach(track => {
                     track.stop();
                 });
             }
@@ -237,7 +241,7 @@ export async function Capture(instance, element, options, command) {
         context.fillRect(0, 0, canvas.width, canvas.height);
 
         const data = canvas.toDataURL("image/png");
-        photo.setAttribute("src", data);
+        if (photo) photo.setAttribute("src", data);
         
         if (options.continuous) {
             instance.invokeMethodAsync('GetCaptureResult', data);
@@ -252,13 +256,22 @@ export async function Capture(instance, element, options, command) {
             context.drawImage(video, 0, 0, width, height);
 
             const data = canvas.toDataURL("image/png");
-            photo.setAttribute("src", data);
+            if (photo) photo.setAttribute("src", data);
             instance.invokeMethodAsync('GetCaptureResult', data);
         } else {
             clearphoto();
         }
     }
 
+    function destroy() {
+        video = element.querySelector("[data-action=video]");
+        if (video.srcObject) {
+            video.srcObject.getTracks().forEach(track => {
+                track.stop();
+                console.log(track.label + ' stop'); 
+          });
+        }
+    }
     return true;
 }
 
