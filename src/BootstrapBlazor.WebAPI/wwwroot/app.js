@@ -146,32 +146,29 @@ export async function Capture(instance, element, options, command) {
                     instance.invokeMethodAsync('GetError', `An error occurred: ${err}`);
                 });
 
-        } else {
+        } else if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
 
             if (!navigator.mediaDevices?.enumerateDevices) {
                 console.log("enumerateDevices() not supported.");
             } else {
                 var constraints = { video: { facingMode: "environment" }, audio: false };
                 if (selectedDeviceId != null) {
-                    constraints = { deviceId: selectedDeviceId  }
+                    constraints = { video: { deviceId: selectedDeviceId ? { exact: selectedDeviceId } : undefined }, audio: false }
                 }
-                console.log(constraints.deviceId);
+                console.log(constraints.video.deviceId);
                 navigator.mediaDevices
-                    .getUserMedia({
-                        video: { constraints },
-                        audio: false
-                    })
+                    .getUserMedia(constraints)
                     .then((stream) => {
 
-                        //try {
-                        //    video.srcObject = null;
-                        //}
-                        //catch (err) {
-                        //    video.src = '';
-                        //}
-                        //if (video) {
-                        //    video.removeAttribute('src');
-                        //}
+                        try {
+                            video.srcObject = null;
+                        }
+                        catch (err) {
+                            video.src = '';
+                        }
+                        if (video) {
+                            video.removeAttribute('src');
+                        }
 
                         video.srcObject = stream;
                         video.play();
@@ -216,14 +213,14 @@ export async function Capture(instance, element, options, command) {
             }
 
 
-            //} else {
-            //    alert('不支持这个特性');
+        } else {
+            alert('不支持这个特性');
         }
 
- 
-        //video.removeEventListener('canplay', videoCanPlayListener); 
 
-        video.addEventListener("canplay", videoCanPlayListener,false);
+        video.removeEventListener('canplay', videoCanPlayListener);
+
+        video.addEventListener("canplay", videoCanPlayListener, false);
 
         startbutton.addEventListener(
             "click",
@@ -245,8 +242,7 @@ export async function Capture(instance, element, options, command) {
 
     }
 
-    function videoCanPlayListener()
-    {
+    function videoCanPlayListener() {
         if (!streaming) {
             height = video.videoHeight / (video.videoWidth / width);
 
