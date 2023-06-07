@@ -221,7 +221,8 @@ export async function Capture(instance, element, options, command) {
         video.removeEventListener('canplay', videoCanPlayListener);
 
         video.addEventListener("canplay", videoCanPlayListener, false);
-
+        
+        // TODO : 选摄像头多次导致按钮重复要解决
         startbutton.addEventListener(
             "click",
             (ev) => {
