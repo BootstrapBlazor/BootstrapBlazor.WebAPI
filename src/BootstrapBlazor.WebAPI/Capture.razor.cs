@@ -86,6 +86,12 @@ public partial class Capture : IAsyncDisposable
     public bool Auto { get; set; } = true;
 
     /// <summary>
+    /// 图像质量,默认为 0.8
+    /// </summary>
+    [Parameter]
+    public double Quality { get; set; } = 0.8d;
+
+    /// <summary>
     /// 选择设备按钮文本/Select device button title
     /// </summary>
     [Parameter]
@@ -146,6 +152,7 @@ public partial class Capture : IAsyncDisposable
             Options.Continuous = continuous ?? Continuous;
             Options.Camera = camera ?? Camera;
             Options.Debug = debug ?? Debug;
+            Options.Quality = Quality;
             await module!.InvokeVoidAsync("Capture", Instance, Element, Options, "Start");
         }
         catch (Exception e)

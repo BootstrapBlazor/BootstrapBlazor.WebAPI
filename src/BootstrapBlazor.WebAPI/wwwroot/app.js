@@ -99,6 +99,12 @@ export async function Capture(instance, element, options, command) {
     let sourceSelect = null;
     let sourceSelectPanel = null;
     let selectedDeviceId = null;
+    let quality = 0.8;
+
+    if (options.quality)
+    {
+        quality =  options.quality;
+    }
 
     if (command == 'Start') {
         startup();
@@ -267,7 +273,8 @@ export async function Capture(instance, element, options, command) {
         if (photo) photo.setAttribute("src", data);
 
         if (options.continuous) {
-            instance.invokeMethodAsync('GetCaptureResult', data);
+            const data2 = canvas.toDataURL("image/jpeg", quality);
+            instance.invokeMethodAsync('GetCaptureResult', data2);
         }
     }
 
@@ -278,7 +285,7 @@ export async function Capture(instance, element, options, command) {
             canvas.height = height;
             context.drawImage(video, 0, 0, width, height);
 
-            const data = canvas.toDataURL("image/png");
+            const data = canvas.toDataURL("image/jpeg", quality);
             if (photo) photo.setAttribute("src", data);
             instance.invokeMethodAsync('GetCaptureResult', data);
         } else {

@@ -36,4 +36,11 @@ public class CaptureOptions
     [DisplayName("显示log")]
     public bool Debug { get; set; }
 
+    /// <summary>
+    /// 图像质量,默认为 0.8
+    /// </summary>
+    [DisplayName("图像质量")]
+    public double Quality { get; set; } = 0.8d;
+
+
 }
