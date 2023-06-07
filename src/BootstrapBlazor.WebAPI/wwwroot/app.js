@@ -86,8 +86,8 @@ export function GetNetworkInfo(wrapper) {
 
 export async function Capture(instance, element, options, command) {
 
-    const width = 500;  
-    let height = 0; 
+    const width = 500;
+    let height = 0;
     let streaming = false;
 
     let log = null;
@@ -132,6 +132,8 @@ export async function Capture(instance, element, options, command) {
         sourceSelect = element.querySelector("[data-action=sourceSelect]");
         sourceSelectPanel = element.querySelector("[data-action=sourceSelectPanel]");
 
+        destroy();
+
         if (!options.camera && navigator.mediaDevices && navigator.mediaDevices.getDisplayMedia) {
             navigator.mediaDevices
                 .getDisplayMedia({ video: true, audio: false })
@@ -143,77 +145,84 @@ export async function Capture(instance, element, options, command) {
                     console.error(`An error occurred: ${err}`);
                     instance.invokeMethodAsync('GetError', `An error occurred: ${err}`);
                 });
-        }else if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+
+        } else {
 
             if (!navigator.mediaDevices?.enumerateDevices) {
                 console.log("enumerateDevices() not supported.");
-            } else if (selectedDeviceId==null) {
-                navigator.mediaDevices.enumerateDevices()
-                    .then((devices) => {
-                        devices.forEach((device) => {
-                            if (device.kind === 'videoinput') {
-                                if (options.debug) console.log(`${device.label} id = ${device.deviceId}`);
-                                const sourceOption = document.createElement('option');
-                                sourceOption.text = device.label
-                                sourceOption.value = device.deviceId
-                                sourceSelect.appendChild(sourceOption)
-                                selectedDeviceId = device.deviceId;
-                            }
-                        });
+            } else {
+                var constraints = { video: { facingMode: "environment" }, audio: false };
+                if (selectedDeviceId != null) {
+                    constraints = { deviceId: { exact: selectedDeviceId } }
+                }
+                navigator.mediaDevices
+                    .getUserMedia({
+                        video: { constraints },
+                        audio: false
+                    })
+                    .then((stream) => {
 
-                        sourceSelect.onchange = () => {
-                            selectedDeviceId = sourceSelect.value;
-                            if (options.debug) console.log(`selectedDevice: ${sourceSelect.options[sourceSelect.selectedIndex].text} id = ${sourceSelect.value}`);
-                            startup();
+                        try {
+                            video.srcObject = null;
+                        }
+                        catch (err) {
+                            video.src = '';
+                        }
+                        if (video) {
+                            video.removeAttribute('src');
                         }
 
-                        sourceSelectPanel.style.display = 'block'
+                        video.srcObject = stream;
+                        video.play();
 
+                        if (selectedDeviceId == null) {
+                            navigator.mediaDevices.enumerateDevices()
+                                .then((devices) => {
+                                    devices.forEach((device) => {
+                                        if (device.kind === 'videoinput') {
+                                            if (options.debug) console.log(`${device.label} id = ${device.deviceId}`);
+                                            const sourceOption = document.createElement('option');
+                                            if (device.label === '') {
+                                                sourceOption.text = 'Camera' + (sourceSelect.length + 1);
+                                            } else {
+                                                sourceOption.text = device.label
+                                            }
+                                            sourceOption.value = device.deviceId
+                                            sourceSelect.appendChild(sourceOption)
+                                            selectedDeviceId = device.deviceId;
+                                        }
+                                    });
+
+                                    sourceSelect.onchange = () => {
+                                        selectedDeviceId = sourceSelect.value;
+                                        if (options.debug) console.log(`selectedDevice: ${sourceSelect.options[sourceSelect.selectedIndex].text} id = ${sourceSelect.value}`);
+                                        startup();
+                                    }
+
+                                    sourceSelectPanel.style.display = 'block'
+
+                                })
+                                .catch((err) => {
+                                    console.error(`${err.name}: ${err.message}`);
+                                });
+                        }
                     })
                     .catch((err) => {
-                        console.error(`${err.name}: ${err.message}`);
+                        console.error(`An error occurred: ${err}`);
+                        instance.invokeMethodAsync('GetError', `An error occurred: ${err}`);
                     });
+
             }
 
-            if (video.srcObject) {
-                video.srcObject.getTracks().forEach(track => {
-                    track.stop();
-                });
-            }
 
-            navigator.mediaDevices
-                .getUserMedia({ video: { deviceId: selectedDeviceId ? { exact: selectedDeviceId } : undefined }, audio: false })
-                .then((stream) => {
-                    video.srcObject = stream;
-                    video.play();
-                })
-                .catch((err) => {
-                    console.error(`An error occurred: ${err}`);
-                    instance.invokeMethodAsync('GetError', `An error occurred: ${err}`);
-                });
-        } else {
-            alert('不支持这个特性');
+            //} else {
+            //    alert('不支持这个特性');
         }
-        
-        video.addEventListener(
-            "canplay",
-            (ev) => {
-                if (!streaming) {
-                    height = video.videoHeight / (video.videoWidth / width); 
 
-                    if (isNaN(height)) {
-                        height = width / (4 / 3);
-                    }
+ 
+        video.removeEventListener('canplay', videoCanPlayListener); 
 
-                    video.setAttribute("width", width);
-                    video.setAttribute("height", height);
-                    canvas.setAttribute("width", width);
-                    canvas.setAttribute("height", height);
-                    streaming = true;
-                }
-            },
-            false
-        );
+        video.addEventListener("canplay", videoCanPlayListener,false);
 
         startbutton.addEventListener(
             "click",
@@ -227,14 +236,32 @@ export async function Capture(instance, element, options, command) {
         clearphoto();
 
         if (options.continuous) {
-           takepicture();
-           sendTimer = window.setInterval(async () => {
+            takepicture();
+            sendTimer = window.setInterval(async () => {
                 takepicture();
             }, 5000)
         }
 
-    } 
+    }
 
+    function videoCanPlayListener()
+    {
+        if (!streaming) {
+            height = video.videoHeight / (video.videoWidth / width);
+
+            if (isNaN(height)) {
+                height = width / (4 / 3);
+            }
+
+            video.setAttribute("width", width);
+            video.setAttribute("height", height);
+            canvas.setAttribute("width", width);
+            canvas.setAttribute("height", height);
+            streaming = true;
+            if (options.debug) console.log(`play: ${selectedDeviceId} width = ${width}`);
+        }
+
+    }
     function clearphoto() {
         const context = canvas.getContext("2d");
         context.fillStyle = "#AAA";
@@ -242,12 +269,12 @@ export async function Capture(instance, element, options, command) {
 
         const data = canvas.toDataURL("image/png");
         if (photo) photo.setAttribute("src", data);
-        
+
         if (options.continuous) {
             instance.invokeMethodAsync('GetCaptureResult', data);
         }
     }
-    
+
     function takepicture() {
         const context = canvas.getContext("2d");
         if (width && height) {
@@ -268,8 +295,8 @@ export async function Capture(instance, element, options, command) {
         if (video.srcObject) {
             video.srcObject.getTracks().forEach(track => {
                 track.stop();
-                console.log(track.label + ' stop'); 
-          });
+                console.log(track.label + ' stop');
+            });
         }
     }
     return true;

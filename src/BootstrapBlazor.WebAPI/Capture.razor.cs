@@ -63,13 +63,13 @@ public partial class Capture : IAsyncDisposable
     /// </summary>
     [Parameter]
     public bool Camera { get; set; } = true;
-    
+
     /// <summary>
     /// 获得/设置 显示内置UI
     /// </summary>
     [Parameter]
     public bool ShowUI { get; set; } = true;
-    
+
     /// <summary>
     /// 获得/设置 显示结果
     /// </summary>
@@ -82,6 +82,9 @@ public partial class Capture : IAsyncDisposable
     [Parameter]
     public bool Debug { get; set; }
 
+    [Parameter]
+    public bool Auto { get; set; } = true;
+
     /// <summary>
     /// 选择设备按钮文本/Select device button title
     /// </summary>
@@ -90,7 +93,7 @@ public partial class Capture : IAsyncDisposable
 
     protected override void OnInitialized()
     {
-        CaptureBtnTitle= CaptureBtnTitle?? (Camera?"拍照":"截屏");
+        CaptureBtnTitle = CaptureBtnTitle ?? (Camera ? "拍照" : "截屏");
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -101,7 +104,8 @@ public partial class Capture : IAsyncDisposable
             {
                 module = await JS!.InvokeAsync<IJSObjectReference>("import", "./_content/BootstrapBlazor.WebAPI/app.js" + "?v=" + System.Reflection.Assembly.GetExecutingAssembly().GetName().Version);
                 Instance = DotNetObjectReference.Create(this);
-                await Start();
+                if (Auto)
+                    await Start();
             }
         }
         catch (Exception e)
@@ -128,7 +132,7 @@ public partial class Capture : IAsyncDisposable
     /// <summary>
     /// 截屏
     /// </summary>
-    public virtual async Task Start() =>await Start(null, null, null);
+    public virtual async Task Start() => await Start(null, null, null);
 
 
     /// <summary>
@@ -138,9 +142,9 @@ public partial class Capture : IAsyncDisposable
     {
         try
         {
-            Options = Options?? new CaptureOptions();
-            Options.Continuous = continuous??Continuous;
-            Options.Camera = camera??Camera;
+            Options = Options ?? new CaptureOptions();
+            Options.Continuous = continuous ?? Continuous;
+            Options.Camera = camera ?? Camera;
             Options.Debug = debug ?? Debug;
             await module!.InvokeVoidAsync("Capture", Instance, Element, Options, "Start");
         }
@@ -174,7 +178,7 @@ public partial class Capture : IAsyncDisposable
             if (OnError != null) await OnError.Invoke(e.Message);
         }
     }
-    
+
     /// <summary>
     /// 从 DataUrl 转换为 Stream
     /// <para>Convert from a DataUrl to an Stream</para>
