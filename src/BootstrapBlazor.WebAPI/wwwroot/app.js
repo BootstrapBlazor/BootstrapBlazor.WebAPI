@@ -147,32 +147,6 @@ export async function Capture(instance, element, options, command) {
 
             if (!navigator.mediaDevices?.enumerateDevices) {
                 console.log("enumerateDevices() not supported.");
-            } else if (selectedDeviceId==null) {
-                navigator.mediaDevices.enumerateDevices()
-                    .then((devices) => {
-                        devices.forEach((device) => {
-                            if (device.kind === 'videoinput') {
-                                if (options.debug) console.log(`${device.label} id = ${device.deviceId}`);
-                                const sourceOption = document.createElement('option');
-                                sourceOption.text = device.label
-                                sourceOption.value = device.deviceId
-                                sourceSelect.appendChild(sourceOption)
-                                selectedDeviceId = device.deviceId;
-                            }
-                        });
-
-                        sourceSelect.onchange = () => {
-                            selectedDeviceId = sourceSelect.value;
-                            if (options.debug) console.log(`selectedDevice: ${sourceSelect.options[sourceSelect.selectedIndex].text} id = ${sourceSelect.value}`);
-                            startup();
-                        }
-
-                        sourceSelectPanel.style.display = 'block'
-
-                    })
-                    .catch((err) => {
-                        console.error(`${err.name}: ${err.message}`);
-                    });
             }
 
             if (video.srcObject) {
@@ -181,11 +155,45 @@ export async function Capture(instance, element, options, command) {
                 });
             }
 
+            var constraints = { video: { facingMode: "environment" }, audio: false };
+            if (selectedDeviceId != null) {
+                constraints = { video: { deviceId: selectedDeviceId ? { exact: selectedDeviceId } : undefined }, audio: false };
+            }
+
             navigator.mediaDevices
-                .getUserMedia({ video: { deviceId: selectedDeviceId ? { exact: selectedDeviceId } : undefined }, audio: false })
+                .getUserMedia(constraints)
                 .then((stream) => {
                     video.srcObject = stream;
                     video.play();
+
+                    if (selectedDeviceId == null) {
+                        navigator.mediaDevices.enumerateDevices()
+                            .then((devices) => {
+                                devices.forEach((device) => {
+                                    if (device.kind === 'videoinput') {
+                                        if (options.debug) console.log(`${device.label} id = ${device.deviceId}`);
+                                        const sourceOption = document.createElement('option');
+                                        sourceOption.text = device.label
+                                        sourceOption.value = device.deviceId
+                                        sourceSelect.appendChild(sourceOption)
+                                        selectedDeviceId = device.deviceId;
+                                    }
+                                });
+
+                                sourceSelect.onchange = () => {
+                                    selectedDeviceId = sourceSelect.value;
+                                    if (options.debug) console.log(`selectedDevice: ${sourceSelect.options[sourceSelect.selectedIndex].text} id = ${sourceSelect.value}`);
+                                    startup();
+                                }
+
+                                sourceSelectPanel.style.display = 'block'
+
+                            })
+                            .catch((err) => {
+                                console.error(`${err.name}: ${err.message}`);
+                            });
+                    }
+
                 })
                 .catch((err) => {
                     console.error(`An error occurred: ${err}`);
