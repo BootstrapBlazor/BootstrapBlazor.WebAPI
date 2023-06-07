@@ -153,8 +153,9 @@ export async function Capture(instance, element, options, command) {
             } else {
                 var constraints = { video: { facingMode: "environment" }, audio: false };
                 if (selectedDeviceId != null) {
-                    constraints = { deviceId: { exact: selectedDeviceId } }
+                    constraints = { deviceId: selectedDeviceId  }
                 }
+                console.log(constraints.deviceId);
                 navigator.mediaDevices
                     .getUserMedia({
                         video: { constraints },
@@ -162,15 +163,15 @@ export async function Capture(instance, element, options, command) {
                     })
                     .then((stream) => {
 
-                        try {
-                            video.srcObject = null;
-                        }
-                        catch (err) {
-                            video.src = '';
-                        }
-                        if (video) {
-                            video.removeAttribute('src');
-                        }
+                        //try {
+                        //    video.srcObject = null;
+                        //}
+                        //catch (err) {
+                        //    video.src = '';
+                        //}
+                        //if (video) {
+                        //    video.removeAttribute('src');
+                        //}
 
                         video.srcObject = stream;
                         video.play();
@@ -220,7 +221,7 @@ export async function Capture(instance, element, options, command) {
         }
 
  
-        video.removeEventListener('canplay', videoCanPlayListener); 
+        //video.removeEventListener('canplay', videoCanPlayListener); 
 
         video.addEventListener("canplay", videoCanPlayListener,false);
 
