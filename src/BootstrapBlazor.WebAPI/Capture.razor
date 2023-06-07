@@ -5,7 +5,15 @@
     <div @ref="Element">
 
         <div data-action="camera" class="camera">
-            <video data-action="video" class="video">Video stream not available.</video>
+            <video data-action="video" class="video"
+                   muted
+                   webkit-playsinline
+                   playsinline
+                   x-webkit-airplay="allow"
+                   x5-video-player-type="h5"
+                   x5-video-player-fullscreen="true"
+                   x5-video-orientation="portraint">
+                    Video stream not available.</video>
             <button data-action="startbutton" class="startbutton">@CaptureBtnTitle</button>
         </div>
 
