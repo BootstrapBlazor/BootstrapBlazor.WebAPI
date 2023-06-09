@@ -10,36 +10,20 @@
 
     @if (Capture && CaptureUser)
     {
-        if (Multiple)
-        {
-            <InputFile id="@id" OnChange="OnChange" class="sr-only" accept="@(ImageOnly ? "image/*" : Accept)" multiple capture="user" />
-        }
-        else
-        {
-            <InputFile id="@id" OnChange="OnChange" class="sr-only" accept="@(ImageOnly ? "image/*" : Accept)" capture="user" />
-        }
+        <InputFile id="@id" OnChange="OnChange" class="sr-only" accept="@(ImageOnly ? "image/*" : Accept)" capture="user" />
     }
     else if (Capture)
     {
-        if (Multiple)
-        {
-            <InputFile id="@id" OnChange="OnChange" class="sr-only" accept="@(ImageOnly ? "image/*" : Accept)" multiple capture />
-        }
-        else
-        {
-            <InputFile id="@id" OnChange="OnChange" class="sr-only" accept="@(ImageOnly ? "image/*" : Accept)" capture />
-        }
+        <InputFile id="@id" OnChange="OnChange" class="sr-only" accept="@(ImageOnly ? "image/*" : Accept)" capture />
+    }
+    else if (Multiple)
+    {
+        <InputFile id="@id" OnChange="OnChange" class="sr-only" accept="@(ImageOnly ? "image/*" : Accept)" multiple />
     }
     else
     {
-        if (Multiple)
-        {
-            <InputFile id="@id" OnChange="OnChange" class="sr-only" accept="@(ImageOnly ? "image/*" : Accept)" multiple />
-        }
-        else
-        {
-            <InputFile id="@id" OnChange="OnChange" class="sr-only" accept="@(ImageOnly ? "image/*" : Accept)" />
-        }
+        <InputFile id="@id" OnChange="OnChange" class="sr-only" accept="@(ImageOnly ? "image/*" : Accept)" />
     }
+
 
 </div>

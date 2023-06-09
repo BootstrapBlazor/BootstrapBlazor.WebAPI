@@ -34,11 +34,11 @@ public partial class UploadToBase64
     public bool  ImageOnly  { get; set; } = true;
 
     /// <summary>
-    /// 在移动设备上可使用相机拍照, 默认为 true
+    /// 在移动设备上可使用相机拍照, 默认为 false
     /// <see href="https://developer.mozilla.org/en-US/docs/Web/HTML/Attributes/capture"/>
     /// </summary>
     [Parameter]
-    public bool Capture { get; set; } = true;
+    public bool Capture { get; set; } 
 
     /// <summary>
     /// 在移动设备上使用前置相机拍照, 默认为 false
