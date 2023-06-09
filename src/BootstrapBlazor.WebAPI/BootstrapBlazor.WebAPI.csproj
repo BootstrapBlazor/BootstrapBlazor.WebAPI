@@ -6,11 +6,11 @@
     </PropertyGroup>
 
     <PropertyGroup>
-        <Version>7.1.2</Version>
+        <Version>7.2.0</Version>
         <PackageProjectUrl>https://github.com/densen2014/BootstrapBlazor.WebAPI</PackageProjectUrl>
         <RepositoryUrl>https://github.com/densen2014/BootstrapBlazor.WebAPI</RepositoryUrl>
         <RepositoryType>git</RepositoryType>
-        <PackageTags>Bootstrap Blazor WebAPI 组件 (浏览器信息/电池信息/网络信息/截屏/录像)</PackageTags>
+        <PackageTags>Bootstrap Blazor WebAPI 组件 (浏览器信息/电池信息/网络信息/截屏/录像/上传/Cookie/LocalStorage)</PackageTags>
         <Description>Bootstrap UI WebAPI components experience (Battery info/Network info)</Description>
         <AssemblyName>BootstrapBlazor.WebAPI</AssemblyName>
         <RootNamespace>BootstrapBlazor.WebAPI</RootNamespace>

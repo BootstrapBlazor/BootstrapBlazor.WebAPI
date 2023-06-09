@@ -150,9 +150,24 @@ public partial class UploadToBase64
 
     public class ImageFile
     {
+        /// <summary>
+        /// 文件名称
+        /// </summary>
         public string? Name { get; set; }
+
+        /// <summary>
+        /// 文件大小
+        /// </summary>
         public long Size { get; set; }
+
+        /// <summary>
+        /// 文件类型
+        /// </summary>
         public string? ContentType { get; set; }
+
+        /// <summary>
+        /// Base64 DataUrl 格式
+        /// </summary>
         public string? DataUrl { get; set; }
     }
 

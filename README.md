@@ -1,16 +1,21 @@
-# Blazor WebAPI 组件 (浏览器信息/电池信息/网络信息/截屏/录像)
+# Blazor WebAPI 组件 (浏览器信息/电池信息/网络信息/截屏/录像/上传/Cookie/LocalStorage)
 
 1. 电池信息类
 2. 网络信息类
 3. 浏览器信息类
-4. 截屏类
-
+4. 截屏录像类
+5. 上传
+6. Cookie/LocalStorage
 
 示例:
 
 https://blazor.app1.es/WebAPI
 
 https://blazor.app1.es/screencapture
+
+https://blazor.app1.es/Storages
+
+https://blazor.app1.es/UploadToBase64s
 
 使用方法:
 
@@ -76,9 +81,9 @@ https://blazor.app1.es/screencapture
 ----
 #### 更新历史
 
-v7.1.1 
+v7.2
 - 添加 Cookie / LocalStorage 服务
-- 添加 UploadToBase64 组件
+- 添加 上传图片 UploadToBase64 组件
 - Capture 组件优化
 
 ---
