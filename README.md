@@ -73,7 +73,13 @@ https://blazor.app1.es/screencapture
 
 } 
 ```
+----
+#### 更新历史
 
+v7.1.1 
+- 添加 Cookie / LocalStorage 服务
+- 添加 UploadToBase64 组件
+- Capture 组件优化
 
 ---
 #### Blazor 组件
