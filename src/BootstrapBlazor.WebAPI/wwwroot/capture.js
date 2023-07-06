@@ -1,6 +1,6 @@
 ﻿export async function Capture(instance, element, options, command) {
 
-    const width = 500;
+    const width = 640;
     let height = 0;
     let streaming = false;
 
@@ -44,6 +44,7 @@
         if (showViewLiveResultButton()) {
             return;
         }
+
         log = element.querySelector("[data-action=log]");
         video = element.querySelector("[data-action=video]");
         canvas = element.querySelector("[data-action=canvas]");
@@ -82,7 +83,7 @@
 
                 if (options.width) {
 
-                    console.log(options.width, options.height);
+                    console.log(`Set: ${selectedDeviceId} video ${options.width} x ${options.height}`);
 
                     constraints = {
                         video: {
@@ -197,7 +198,7 @@
             canvas.setAttribute("height", height);
             streaming = true;
             //if (options.debug)
-                console.log(`play: ${selectedDeviceId} width = ${width}`);
+            console.log(`play DeviceId: ${selectedDeviceId} video ${video.videoWidth} x ${video.videoHeight}`);
         }
 
     }
@@ -223,7 +224,8 @@
             canvas.height = video.videoHeight;
             context.drawImage(video, 0, 0, canvas.width, canvas.height);
 
-            const data = canvas.toDataURL("image/jpeg", quality);
+            console.log(`take: ${video.videoWidth} x ${video.videoHeight}`);
+           const data = canvas.toDataURL("image/jpeg", quality);
             if (photo) photo.setAttribute("src", data);
             instance.invokeMethodAsync('GetCaptureResult', data);
         } else {
