@@ -42,5 +42,17 @@ public class CaptureOptions
     [DisplayName("图像质量")]
     public double Quality { get; set; } = 0.8d;
 
+    /// <summary>
+    /// 图像宽度
+    /// </summary>
+    [DisplayName("图像宽度")]
+    public int? Width { get; set; } = 640;
+
+    /// <summary>
+    /// 图像高度
+    /// </summary>
+    [DisplayName("图像高度")]
+    public int? Height { get; set; } = 480;
+
 
 }

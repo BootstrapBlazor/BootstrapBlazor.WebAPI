@@ -6,6 +6,7 @@
 
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
+using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 using System.Text.RegularExpressions;
 
@@ -91,6 +92,19 @@ public partial class Capture : IAsyncDisposable
     [Parameter]
     public double Quality { get; set; } = 0.8d;
 
+
+    /// <summary>
+    /// 图像宽度
+    /// </summary>
+    [Parameter]
+    public int? Width { get; set; }
+
+    /// <summary>
+    /// 图像高度
+    /// </summary>
+    [Parameter]
+    public int? Height { get; set; }
+
     /// <summary>
     /// 选择设备按钮文本/Select device button title
     /// </summary>
@@ -108,7 +122,7 @@ public partial class Capture : IAsyncDisposable
         {
             if (firstRender)
             {
-                module = await JS!.InvokeAsync<IJSObjectReference>("import", "./_content/BootstrapBlazor.WebAPI/app.js" + "?v=" + System.Reflection.Assembly.GetExecutingAssembly().GetName().Version);
+                module = await JS!.InvokeAsync<IJSObjectReference>("import", "./_content/BootstrapBlazor.WebAPI/capture.js" + "?v=" + System.Reflection.Assembly.GetExecutingAssembly().GetName().Version);
                 Instance = DotNetObjectReference.Create(this);
                 if (Auto)
                     await Start();
@@ -153,6 +167,8 @@ public partial class Capture : IAsyncDisposable
             Options.Camera = camera ?? Camera;
             Options.Debug = debug ?? Debug;
             Options.Quality = Quality;
+            Options.Width = Width;
+            Options.Height = Height;
             await module!.InvokeVoidAsync("Capture", Instance, Element, Options, "Start");
         }
         catch (Exception e)
