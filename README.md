@@ -81,6 +81,9 @@ https://blazor.app1.es/UploadToBase64s
 ----
 #### 更新历史
 
+v7.2.2
+- Capture 组件添加指定高宽,可保存高质量图片
+
 v7.2
 - 添加 Cookie / LocalStorage 服务
 - 添加 上传图片 UploadToBase64 组件
