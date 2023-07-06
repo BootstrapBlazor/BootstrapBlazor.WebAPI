@@ -1,6 +1,6 @@
 ﻿export async function Capture(instance, element, options, command) {
 
-    const width = 640;
+    let width = 640;
     let height = 0;
     let streaming = false;
 
@@ -15,9 +15,8 @@
     let selectedDeviceId = null;
     let quality = 0.8;
 
-    if (options.quality)
-    {
-        quality =  options.quality;
+    if (options.quality) {
+        quality = options.quality;
     }
 
     if (command == 'Start') {
@@ -72,33 +71,32 @@
             if (!navigator.mediaDevices?.enumerateDevices) {
                 console.log("enumerateDevices() not supported.");
             } else {
+                if (!options.width) options.width = 640;
+                if (!options.height) options.height = 480;
+                width = options.width;
+                console.log(`Set: ${selectedDeviceId} video ${options.width} x ${options.height}`);
                 var constraints = {
-                    video: { 
-                        width: { ideal: 640, max: 1920 },
-                        height: { ideal: 480, max: 1080 },
+                    video: {
+                        width: { ideal: options.width },
+                        height: { ideal: options.height },
                         facingMode: "environment",
-                        focusMode:"continuous",
+                        focusMode: "continuous",
                     }, audio: false
                 };
 
-                if (options.width) {
-
-                    console.log(`Set: ${selectedDeviceId} video ${options.width} x ${options.height}`);
-
+                if (selectedDeviceId != null) {
                     constraints = {
                         video: {
-                            width: { ideal: options.width, max: 1920 },
-                            height: { ideal: options.height, max: 1080 },
+                            deviceId: selectedDeviceId ? { exact: selectedDeviceId } : undefined,
+                            width: { ideal: options.width },
+                            height: { ideal: options.height },
                             facingMode: "environment",
                             focusMode: "continuous",
-                        }, audio: false
-                    };
+                        },
+                        audio: false
+                    }
+                    console.log(constraints.video.deviceId);
                 }
-
-                if (selectedDeviceId != null) {
-                    constraints = { video: { deviceId: selectedDeviceId ? { exact: selectedDeviceId } : undefined }, audio: false }
-                }
-                console.log(constraints.video.deviceId);
                 navigator.mediaDevices
                     .getUserMedia(constraints)
                     .then((stream) => {
@@ -164,10 +162,10 @@
         video.removeEventListener('canplay', videoCanPlayListener);
 
         video.addEventListener("canplay", videoCanPlayListener, false);
-        
+
         startbutton.removeEventListener('canplay', videoCanPlayListener);
 
-        startbutton.addEventListener("click", takepictureListener,false);
+        startbutton.addEventListener("click", takepictureListener, false);
 
         clearphoto();
 
@@ -222,10 +220,10 @@
         if (width && height) {
             canvas.width = video.videoWidth;
             canvas.height = video.videoHeight;
-            context.drawImage(video, 0, 0, canvas.width, canvas.height);
+            context.drawImage(video, 0, 0, video.videoWidth, video.videoHeight, 0, 0, canvas.width, canvas.height);
 
             console.log(`take: ${video.videoWidth} x ${video.videoHeight}`);
-           const data = canvas.toDataURL("image/jpeg", quality);
+            const data = canvas.toDataURL("image/jpeg", quality);
             if (photo) photo.setAttribute("src", data);
             instance.invokeMethodAsync('GetCaptureResult', data);
         } else {
