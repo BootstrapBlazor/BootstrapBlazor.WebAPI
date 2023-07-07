@@ -40,19 +40,19 @@ public class CaptureOptions
     /// 图像质量,默认为 0.8
     /// </summary>
     [DisplayName("图像质量")]
-    public double Quality { get; set; } = 0.8d;
+    public double Quality { get; set; } = 0.9d;
 
     /// <summary>
     /// 图像宽度
     /// </summary>
     [DisplayName("图像宽度")]
-    public int? Width { get; set; } = 640;
+    public int? Width { get; set; }  
 
     /// <summary>
     /// 图像高度
     /// </summary>
     [DisplayName("图像高度")]
-    public int? Height { get; set; } = 480;
+    public int? Height { get; set; }  
 
 
 }
