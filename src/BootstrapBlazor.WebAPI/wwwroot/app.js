@@ -88,3 +88,164 @@ export async function getUserAgent() {
     console.log(navigator.userAgent);
     return navigator.userAgent;
 }
+
+export async function Share(title, text, url) {
+    // 调用navigator.share方法进行分享，传入分享内容的相关信息
+    navigator.share({
+        title: title, // 分享标题
+        text: text, // 分享文本
+        url: url, // 分享链接
+    });
+}
+
+export async function ScreenOrientation(type) {
+    if (type == 'LockPortrait') {
+        //锁定屏幕方向为竖屏
+        await screen.orientation.lock("portrait");
+    }
+    else if (type == 'LockLandscape') {
+        //锁定屏幕方向为横屏
+        await screen.orientation.lock("landscape");
+    }
+    else if (type == 'Unlock') {
+        //解除屏幕方向锁定
+        screen.orientation.unlock();
+    }
+    else if (type == 'GetOrientation') {
+        //返回屏幕当前的方向
+        return screen.orientation.type;
+    }
+}
+
+export async function SpeechRecognition() {
+    //语音识别
+
+    // Request speech recognition
+    const recognition = new window.SpeechRecognition();
+
+    // Start speech recognition
+    recognition.start();
+
+    // Handle recognition results
+    recognition.onresult = (event) => {
+        const transcript = event.results[0][0].transcript;
+        console.log('Speech Recognition Result:', transcript);
+    };
+
+    // Handle recognition errors
+    recognition.onerror = (event) => {
+        console.error('Speech Recognition Error:', event.error);
+    };
+
+}
+
+export async function SpeechSynthesis(text, lang) {
+    //语音合成（文字转语音）
+
+    if (!text) text = 'hello blazor';
+    if (!lang) lang = 'zh-CN';
+
+
+    // Create speech synthesis utterance
+    const utterance = new SpeechSynthesisUtterance();
+    utterance.text = text;
+
+    // Speech synthesis voices
+    const voices = speechSynthesis.getVoices();
+
+    // Set voice and language
+    utterance.voice = voices.find(voice => voice.lang === 'zh-CN');
+
+    // Speak the text
+    speechSynthesis.speak(utterance);
+}
+
+let chunks = [];
+let mediaRecorder;
+let videoformat = "video/webm";
+
+export async function ScreenRecord(instance, type, isUpload=false, format = "video/webm") {
+
+    console.log(MediaRecorder.isTypeSupported("video/webm"))
+    console.log(MediaRecorder.isTypeSupported("video/mp4"))
+    console.log(MediaRecorder.isTypeSupported("video/mp4;codecs=avc1"))
+
+    let typeSupported = getvideoformat();
+
+    if (type == 'start') {
+        startRecording(); // Start the recording
+    }
+    else if (type == 'stop') {
+        stopRecording(); // Stop screen recording
+    }
+    else if (type == 'getTypeSupported') {
+        return typeSupported;
+    }
+
+    function getvideoformat() {
+        let typeSupported = [];
+
+        if (MediaRecorder.isTypeSupported("video/webm"))
+        {
+            if (!format) videoformat = "webm";
+            typeSupported.push("webm");
+        }
+        if (MediaRecorder.isTypeSupported("video/mp4"))
+        {
+            if (!format) videoformat = "mp4";
+            typeSupported.push("mp4");
+        } 
+        if (MediaRecorder.isTypeSupported("video/mp4;codecs=avc1"))
+        {
+            if (!format) videoformat = "mp4";
+            typeSupported.push("mp4_avc1");
+        } 
+
+        return typeSupported;
+    }
+
+    async function startRecording() {
+        chunks = [];
+        if (navigator.mediaDevices && navigator.mediaDevices.getDisplayMedia) {
+            var stream = await navigator.mediaDevices.getDisplayMedia(
+                { video: { mediaSource: "screen" }, audio: true }
+            );
+
+            mediaRecorder = new MediaRecorder(stream, { mimeType: videoformat });
+            mediaRecorder.ondataavailable = (e) => {
+                if (e.data.size > 0) {
+                    chunks.push(e.data);
+                }
+            }
+            mediaRecorder.onstop = () => {
+                chunks = [];
+            }
+            mediaRecorder.start(250)
+        } else {
+            alert('不支持这个特性');
+        }
+    }
+
+    function stopRecording() {
+
+        mediaRecorder.stop(); // Stopping the recording
+        let blob = new Blob(chunks, { type: videoformat })
+        chunks = [] // Resetting the data chunks
+
+        if (!isUpload) {
+            var dataDownloadUrl = URL.createObjectURL(blob);
+            var filename = window.prompt("File name", "video"); // Ask the file name
+            // Downloadin it onto the user's device
+            let a = document.createElement('a')
+            a.href = dataDownloadUrl;
+            a.download = `${filename}.${videoformat == "video/webm" ? "webm" :"mp4"}`
+            a.click()
+
+            URL.revokeObjectURL(dataDownloadUrl)
+        } else {
+            instance.invokeMethodAsync('GetScreenRecordResult', blob, "video/webm" ? "webm" : "mp4");
+        }
+
+
+    }
+}

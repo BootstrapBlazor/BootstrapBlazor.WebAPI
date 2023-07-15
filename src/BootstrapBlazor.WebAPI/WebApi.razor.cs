@@ -7,7 +7,10 @@
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 using System.Reflection;
+using System.Reflection.Metadata;
+using System.Xml.Linq;
 using UAParser;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace BootstrapBlazor.Components;
 
@@ -161,5 +164,156 @@ public partial class WebApi : IAsyncDisposable
         }
     }
 
+    /// <summary>
+    /// 分享文本、链接甚至是文件到设备上安装的其他应用程序
+    /// </summary>
+    /// <param name="title">分享标题</param>
+    /// <param name="text">分享文本</param>
+    /// <param name="url">分享链接</param>
+    /// <returns></returns>
+    public virtual async Task Share(string title, string text, string url)
+    {
+        try
+        {
+            await module!.InvokeVoidAsync("Share", title, text, url);
+        }
+        catch (Exception e)
+        {
+            if (OnError != null) await OnError.Invoke(e.Message);
+        }
+    }
+
+    /// <summary>
+    /// 检查屏幕的当前方向，甚至锁定到特定的方向
+    /// </summary>
+    /// <param name="screen"></param>
+    /// <returns></returns>
+    public virtual async Task<string> ScreenOrientation(Screen screen)
+    {
+        try
+        {
+           return await module!.InvokeAsync<string>("ScreenOrientation", screen.ToString());
+        }
+        catch (Exception e)
+        {
+            if (OnError != null) await OnError.Invoke(e.Message);
+            return e.Message;
+        }
+    }
+
+    /// <summary>
+    /// 语音识别
+    /// </summary>
+    /// <returns></returns>
+    public virtual async Task<string> SpeechRecognition()
+    {
+        try
+        {
+           return await module!.InvokeAsync<string>("SpeechRecognition");
+        }
+        catch (Exception e)
+        {
+            if (OnError != null) await OnError.Invoke(e.Message);
+            return e.Message;
+        }
+    }
+
+    /// <summary>
+    /// 语音合成（文字转语音）
+    /// </summary>
+    /// <param name="text"></param>
+    /// <param name="lang"></param>
+    /// <returns></returns>
+    public virtual async Task SpeechSynthesis(string text,string lang= "zh-CN")
+    {
+        try
+        {
+           await module!.InvokeVoidAsync("SpeechSynthesis", text, lang);
+        }
+        catch (Exception e)
+        {
+            if (OnError != null) await OnError.Invoke(e.Message);
+        }
+    }
+
+
+    /// <summary>
+    /// 屏幕录屏开始
+    /// </summary>
+    /// <param name="screen"></param>
+    /// <returns></returns>
+    public virtual async Task ScreenRecordStart()
+    {
+        try
+        {
+           await module!.InvokeVoidAsync("ScreenRecord",Instance, "start");
+        }
+        catch (Exception e)
+        {
+            if (OnError != null) await OnError.Invoke(e.Message);
+        }
+    }
+
+    /// <summary>
+    /// 屏幕录屏结束
+    /// </summary>
+    /// <param name="uploadToServer"></param>
+    /// <returns></returns>
+    public virtual async Task<string> ScreenRecordStop(bool uploadToServer=false)
+    {
+        try
+        {
+            return await module!.InvokeAsync<string>("ScreenRecord", Instance, "stop", uploadToServer);
+        }
+        catch (Exception e)
+        {
+            if (OnError != null) await OnError.Invoke(e.Message);
+            return e.Message;
+        }
+    }
+
+    /// <summary>
+    /// 屏幕录屏支持格式
+    /// </summary>
+    /// <param name="screen"></param>
+    /// <returns></returns>
+    public virtual async Task<string[]?> ScreenRecordTypeSupported()
+    {
+        try
+        {
+           return await module!.InvokeAsync<string[]>("ScreenRecord",Instance, "getTypeSupported");
+        }
+        catch (Exception e)
+        {
+            if (OnError != null) await OnError.Invoke(e.Message);
+            return null;
+        }
+    }
+
+
+    /// <summary>
+    /// 获得/设置 屏幕录像回调方法
+    /// </summary>
+    [Parameter]
+    public Func<string  , string  , Task>? OnScreenRecordResult { get; set; }
+
+    /// <summary>
+    /// 获取屏幕录像完成回调方法
+    /// </summary>
+    /// <param name="blob"></param>
+    /// <param name="extName"></param>
+    /// <returns></returns>
+    [JSInvokable]
+    public async Task GetScreenRecordResult(string blob,string extName)
+    {
+        try
+        {
+            if (OnScreenRecordResult != null) await OnScreenRecordResult.Invoke(blob, extName);
+        }
+        catch (Exception e)
+        {
+            if (OnError != null) await OnError.Invoke(e.Message);
+        }
+    }
 
 }
