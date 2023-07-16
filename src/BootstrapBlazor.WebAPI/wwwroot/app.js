@@ -89,13 +89,34 @@ export async function getUserAgent() {
     return navigator.userAgent;
 }
 
-export async function Share(title, text, url) {
+export async function Share(title, text, url, files) {
     // 调用navigator.share方法进行分享，传入分享内容的相关信息
-    navigator.share({
-        title: title, // 分享标题
-        text: text, // 分享文本
-        url: url, // 分享链接
-    });
+    if (!navigator.canShare) {
+        return `Your browser doesn't support the Web Share API.`; 
+    }
+    if (files.length === 0) {
+        navigator.share({
+            title: title, // 分享标题
+            text: text, // 分享文本
+            url: url, // 分享链接
+        });
+        return "OK";
+    }
+
+    if (navigator.canShare({ files })) {
+        try {
+            await navigator.share({
+                files,// 分享文件
+                title: title, // 分享标题
+                text: text, // 分享文本
+            });
+            return  "Shared!";
+        } catch (error) {
+            return `Error: ${error.message}`;
+        }
+    } else {
+        return `Your system doesn't support sharing these files.`;
+    }
 }
 
 export async function ScreenOrientation(type) {
