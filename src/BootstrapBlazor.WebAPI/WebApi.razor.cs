@@ -171,11 +171,19 @@ public partial class WebApi : IAsyncDisposable
     /// <param name="text">分享文本</param>
     /// <param name="url">分享链接</param>
     /// <returns></returns>
-    public virtual async Task Share(string title, string text, string url)
+    public virtual async Task Share(string title, string text, string url, string? files=null)
     {
         try
         {
-            await module!.InvokeVoidAsync("Share", title, text, url);
+            if (!string.IsNullOrWhiteSpace (files))
+            {
+                await module!.InvokeVoidAsync("Share", title, text, url, files);
+            }
+            else
+            {
+                var txt = $@"navigator.share({{title: '{title}',  text: '{text}',  url: '{url}' }});";
+                await JS!.InvokeVoidAsync("eval", $"let discard ={txt}");
+            }
         }
         catch (Exception e)
         {
@@ -192,7 +200,7 @@ public partial class WebApi : IAsyncDisposable
     {
         try
         {
-           return await module!.InvokeAsync<string>("ScreenOrientation", screen.ToString());
+            return await module!.InvokeAsync<string>("ScreenOrientation", screen.ToString());
         }
         catch (Exception e)
         {
@@ -209,7 +217,7 @@ public partial class WebApi : IAsyncDisposable
     {
         try
         {
-           return await module!.InvokeAsync<string>("SpeechRecognition");
+            return await module!.InvokeAsync<string>("SpeechRecognition");
         }
         catch (Exception e)
         {
@@ -224,11 +232,11 @@ public partial class WebApi : IAsyncDisposable
     /// <param name="text"></param>
     /// <param name="lang"></param>
     /// <returns></returns>
-    public virtual async Task SpeechSynthesis(string text,string lang= "zh-CN")
+    public virtual async Task SpeechSynthesis(string text, string lang = "zh-CN")
     {
         try
         {
-           await module!.InvokeVoidAsync("SpeechSynthesis", text, lang);
+            await module!.InvokeVoidAsync("SpeechSynthesis", text, lang);
         }
         catch (Exception e)
         {
@@ -246,7 +254,7 @@ public partial class WebApi : IAsyncDisposable
     {
         try
         {
-           await module!.InvokeVoidAsync("ScreenRecord",Instance, "start");
+            await module!.InvokeVoidAsync("ScreenRecord", Instance, "start");
         }
         catch (Exception e)
         {
@@ -259,7 +267,7 @@ public partial class WebApi : IAsyncDisposable
     /// </summary>
     /// <param name="uploadToServer"></param>
     /// <returns></returns>
-    public virtual async Task<string> ScreenRecordStop(bool uploadToServer=false)
+    public virtual async Task<string> ScreenRecordStop(bool uploadToServer = false)
     {
         try
         {
@@ -281,7 +289,7 @@ public partial class WebApi : IAsyncDisposable
     {
         try
         {
-           return await module!.InvokeAsync<string[]>("ScreenRecord",Instance, "getTypeSupported");
+            return await module!.InvokeAsync<string[]>("ScreenRecord", Instance, "getTypeSupported");
         }
         catch (Exception e)
         {
@@ -295,7 +303,7 @@ public partial class WebApi : IAsyncDisposable
     /// 获得/设置 屏幕录像回调方法
     /// </summary>
     [Parameter]
-    public Func<string  , string  , Task>? OnScreenRecordResult { get; set; }
+    public Func<string, string, Task>? OnScreenRecordResult { get; set; }
 
     /// <summary>
     /// 获取屏幕录像完成回调方法
@@ -304,7 +312,7 @@ public partial class WebApi : IAsyncDisposable
     /// <param name="extName"></param>
     /// <returns></returns>
     [JSInvokable]
-    public async Task GetScreenRecordResult(string blob,string extName)
+    public async Task GetScreenRecordResult(string blob, string extName)
     {
         try
         {
