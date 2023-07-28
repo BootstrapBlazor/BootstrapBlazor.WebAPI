@@ -1,0 +1,25 @@
+﻿@namespace BootstrapBlazor.Components
+
+@if (ShowUI)
+{
+    <div @ref="Element">
+
+        <div data-action="notSupported" class="hidden">
+            Sorry, <b>Web Serial</b> is not supported on this device, make sure you're
+            running Chrome 78 or later and have enabled the
+            <code>#enable-experimental-web-platform-features</code> flag in
+            <code>chrome://flags</code>
+        </div>
+        <br>
+        <button data-action="butConnect" type="button">@ConnectBtnTitle</button>
+        <input type="text" data-action="fname" name="fname">
+        <button data-action='butwrite' type="button">@WriteBtnTitle</button>
+
+    </div>
+}
+@if (Debug)
+{
+    <pre data-action="log"></pre>
+}
+
+ 
