@@ -1,4 +1,4 @@
-﻿export async function Init(instance, element, command) {
+﻿export async function Init(instance, element, options, command) {
     let port;
     let reader;
     let inputDone;
@@ -34,7 +34,8 @@
         if (!port.readable) {
             console.log('尝试连接');
             // Wait for the serial port to open.
-            await port.open({ baudRate: 9600 });
+            if (!options) options = { baudRate: 9600 };
+            await port.open(options);
             if (log) log.textContent += '已连接' + '\n';
             console.log('已连接');
             instance.invokeMethodAsync('GetLog', '已连接');

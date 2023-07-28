@@ -63,6 +63,9 @@ public partial class WebSerial : IAsyncDisposable
     [Parameter]
     public bool Debug { get; set; }
 
+    [Parameter]
+    public WebSerialOptions? Options { get; set; } = new WebSerialOptions();
+
     protected override void OnInitialized()
     {
         ConnectBtnTitle = ConnectBtnTitle ?? "连接";
@@ -75,9 +78,9 @@ public partial class WebSerial : IAsyncDisposable
         {
             if (firstRender)
             {
-                module = await JS!.InvokeAsync<IJSObjectReference>("import", "./_content/BootstrapBlazor.WebAPI/webSerial.js" + "?v=" + System.Reflection.Assembly.GetExecutingAssembly().GetName().Version);
+                module = await JS!.InvokeAsync<IJSObjectReference>("import", "./_content/BootstrapBlazor.WebAPI/WebSerial.razor.js" + "?v=" + System.Reflection.Assembly.GetExecutingAssembly().GetName().Version);
                 Instance = DotNetObjectReference.Create(this);
-                await module!.InvokeVoidAsync("Init", Instance, Element, "Start");
+                await module!.InvokeVoidAsync("Init", Instance, Element, Options, "Start");
             }
         }
         catch (Exception e)
@@ -85,6 +88,12 @@ public partial class WebSerial : IAsyncDisposable
             if (OnError != null) await OnError.Invoke(e.Message);
         }
     }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        await Task.CompletedTask;
+    }
+
     async ValueTask IAsyncDisposable.DisposeAsync()
     {
         Instance?.Dispose();
@@ -93,6 +102,7 @@ public partial class WebSerial : IAsyncDisposable
             await module.DisposeAsync();
         }
     }
+
     /// <summary>
     /// Start
     /// </summary>
@@ -100,7 +110,7 @@ public partial class WebSerial : IAsyncDisposable
     {
         try
         {
-            await module!.InvokeVoidAsync("Init", Instance, Element, "Start");
+            await module!.InvokeVoidAsync("Init", Instance, Element, Options, "Start");
         }
         catch 
         {
