@@ -25,7 +25,7 @@
         if (ports.length > 0) {
             port = ports[0];
             console.log('设备0', port);
-            instance.invokeMethodAsync('GetLog', `设备: ${port}`);
+            instance.invokeMethodAsync('GetLog', `获取到授权设备: ${ports.length}`);
         }
     }
 
@@ -37,8 +37,8 @@
             if (!options) options = { baudRate: 9600 };
             await port.open(options);
             if (log) log.textContent += '已连接' + '\n';
-            console.log('已连接');
-            instance.invokeMethodAsync('GetLog', '已连接');
+            console.log('已连接', port);
+            instance.invokeMethodAsync('GetLog', `已连接:${options.baudRate}`);
         }
     }
 
@@ -119,7 +119,7 @@
             const { value, done } = await reader.read();
             if (value) {
                 if (log) log.textContent +='收到数据: '+ value + '\n';
-                instance.invokeMethodAsync('ReceiveData', value);
+                instance.invokeMethodAsync('ReceiveData', value+"");
             }
             if (done) {
                 console.log('[readLoop] DONE', done);
@@ -158,7 +158,7 @@
 
         transform(chunk, controller) {
             // Append new chunks to existing chunks.
-            this.chunks += chunk;
+            this.chunks += chunk+"";
             // For each line breaks in chunks, send the parsed lines out.
             const lines = this.chunks.split("\r\n");
             this.chunks = lines.pop();

@@ -35,7 +35,7 @@ public partial class WebSerial : IAsyncDisposable
     /// 获得/设置 收到数据回调方法
     /// </summary>
     [Parameter]
-    public Func<string, Task>? OnReceive { get; set; }
+    public Func<string?, Task>? OnReceive { get; set; }
 
     /// <summary>
     /// 连接按钮文本/Connect button title
@@ -66,6 +66,8 @@ public partial class WebSerial : IAsyncDisposable
     [Parameter]
     public WebSerialOptions? Options { get; set; } = new WebSerialOptions();
 
+    WebSerialOptions? OptionsCache { get; set; } 
+
     protected override void OnInitialized()
     {
         ConnectBtnTitle = ConnectBtnTitle ?? "连接";
@@ -81,7 +83,15 @@ public partial class WebSerial : IAsyncDisposable
                 module = await JS!.InvokeAsync<IJSObjectReference>("import", "./_content/BootstrapBlazor.WebAPI/WebSerial.razor.js" + "?v=" + System.Reflection.Assembly.GetExecutingAssembly().GetName().Version);
                 Instance = DotNetObjectReference.Create(this);
                 await module!.InvokeVoidAsync("Init", Instance, Element, Options, "Start");
+                OptionsCache=Options;
             }
+
+            if (!firstRender && module!=null && OptionsCache != Options)
+            {
+                await module!.InvokeVoidAsync("Init", Instance, Element, Options, "Start");
+                OptionsCache = Options;
+            }
+
         }
         catch (Exception e)
         {
@@ -123,13 +133,13 @@ public partial class WebSerial : IAsyncDisposable
     /// <param name="msg"></param>
     /// <returns></returns>
     [JSInvokable]
-    public async Task ReceiveData(string msg)
+    public async Task ReceiveData(object? msg)
     {
         try
         {
-            if (OnReceive != null)
+            if (OnReceive != null && msg != null)
             {
-                await OnReceive.Invoke(msg);
+                await OnReceive.Invoke(msg.ToString());
             }
         }
         catch (Exception e)
