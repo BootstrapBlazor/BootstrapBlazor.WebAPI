@@ -62,6 +62,20 @@ export async function SpeechRecognition(wrapper, lang) {
     }
 
 }
+export async function SpeechRecognitionStop(wrapper) {
+    try {
+        if (recognition) {
+            recognition.stop();
+            wrapper.invokeMethodAsync('GetStatus', "停止识别");
+        }
+        speakBtn.click();
+    } catch (error) {
+        console.error(error);
+        wrapper.invokeMethodAsync('GetError', error.message);
+        return false;
+    }
+    return true;
+}
 
 export async function SpeechSynthesis(wrapper, text, lang, rate = 1, picth = 1, volume = 1, voiceURI = null) {
     try {
@@ -111,25 +125,16 @@ export async function SpeechSynthesis(wrapper, text, lang, rate = 1, picth = 1, 
     }
 }
 
-export async function SpeechRecognitionStop(wrapper) {
-    try {
-        if (recognition)
-            recognition.stop();
-        speakBtn.click();
-    } catch (error) {
-        console.error(error);
-        wrapper.invokeMethodAsync('GetError', error.message);
-    }
-    return true;
-}
 export async function SpeechStop(wrapper) {
     try {
-        if (speechSynthesis.speaking)
+        if (speechSynthesis.speaking) {
             speechSynthesis.cancel();
-        speakBtn.click();
+            wrapper.invokeMethodAsync('GetStatus', "停止播放");
+        }
     } catch (error) {
         console.error(error);
         wrapper.invokeMethodAsync('GetError', error.message);
+        return false;
     }
     return true;
 }
