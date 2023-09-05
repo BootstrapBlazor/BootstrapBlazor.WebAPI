@@ -6,11 +6,8 @@
 
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
-using System.Reflection;
 using System.Reflection.Metadata;
-using System.Xml.Linq;
 using UAParser;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace BootstrapBlazor.Components;
 
@@ -210,42 +207,6 @@ public partial class WebApi : IAsyncDisposable
     }
 
     /// <summary>
-    /// 语音识别
-    /// </summary>
-    /// <returns></returns>
-    public virtual async Task<string> SpeechRecognition()
-    {
-        try
-        {
-            return await module!.InvokeAsync<string>("SpeechRecognition");
-        }
-        catch (Exception e)
-        {
-            if (OnError != null) await OnError.Invoke(e.Message);
-            return e.Message;
-        }
-    }
-
-    /// <summary>
-    /// 语音合成（文字转语音）
-    /// </summary>
-    /// <param name="text"></param>
-    /// <param name="lang"></param>
-    /// <returns></returns>
-    public virtual async Task SpeechSynthesis(string text, string lang = "zh-CN")
-    {
-        try
-        {
-            await module!.InvokeVoidAsync("SpeechSynthesis", text, lang);
-        }
-        catch (Exception e)
-        {
-            if (OnError != null) await OnError.Invoke(e.Message);
-        }
-    }
-
-
-    /// <summary>
     /// 屏幕录屏开始
     /// </summary>
     /// <param name="screen"></param>
@@ -322,6 +283,12 @@ public partial class WebApi : IAsyncDisposable
         {
             if (OnError != null) await OnError.Invoke(e.Message);
         }
+    }
+
+    [JSInvokable]
+    public async Task GetError(string err)
+    {
+        if (OnError != null) await OnError.Invoke(err);
     }
 
 }

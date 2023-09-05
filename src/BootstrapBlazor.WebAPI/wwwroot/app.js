@@ -92,7 +92,7 @@ export async function getUserAgent() {
 export async function Share(title, text, url, files) {
     // 调用navigator.share方法进行分享，传入分享内容的相关信息
     if (!navigator.canShare) {
-        return `Your browser doesn't support the Web Share API.`; 
+        return `Your browser doesn't support the Web Share API.`;
     }
     if (files.length === 0) {
         navigator.share({
@@ -110,7 +110,7 @@ export async function Share(title, text, url, files) {
                 title: title, // 分享标题
                 text: text, // 分享文本
             });
-            return  "Shared!";
+            return "Shared!";
         } catch (error) {
             return `Error: ${error.message}`;
         }
@@ -138,54 +138,11 @@ export async function ScreenOrientation(type) {
     }
 }
 
-export async function SpeechRecognition() {
-    //语音识别
-
-    // Request speech recognition
-    const recognition = new window.SpeechRecognition();
-
-    // Start speech recognition
-    recognition.start();
-
-    // Handle recognition results
-    recognition.onresult = (event) => {
-        const transcript = event.results[0][0].transcript;
-        console.log('Speech Recognition Result:', transcript);
-    };
-
-    // Handle recognition errors
-    recognition.onerror = (event) => {
-        console.error('Speech Recognition Error:', event.error);
-    };
-
-}
-
-export async function SpeechSynthesis(text, lang) {
-    //语音合成（文字转语音）
-
-    if (!text) text = 'hello blazor';
-    if (!lang) lang = 'zh-CN';
-
-
-    // Create speech synthesis utterance
-    const utterance = new SpeechSynthesisUtterance();
-    utterance.text = text;
-
-    // Speech synthesis voices
-    const voices = speechSynthesis.getVoices();
-
-    // Set voice and language
-    utterance.voice = voices.find(voice => voice.lang === 'zh-CN');
-
-    // Speak the text
-    speechSynthesis.speak(utterance);
-}
-
 let chunks = [];
 let mediaRecorder;
 let videoformat = "video/webm";
 
-export async function ScreenRecord(instance, type, isUpload=false, format = "video/webm") {
+export async function ScreenRecord(instance, type, isUpload = false, format = "video/webm") {
 
     console.log(MediaRecorder.isTypeSupported("video/webm"))
     console.log(MediaRecorder.isTypeSupported("video/mp4"))
@@ -206,21 +163,18 @@ export async function ScreenRecord(instance, type, isUpload=false, format = "vid
     function getvideoformat() {
         let typeSupported = [];
 
-        if (MediaRecorder.isTypeSupported("video/webm"))
-        {
+        if (MediaRecorder.isTypeSupported("video/webm")) {
             if (!format) videoformat = "webm";
             typeSupported.push("webm");
         }
-        if (MediaRecorder.isTypeSupported("video/mp4"))
-        {
+        if (MediaRecorder.isTypeSupported("video/mp4")) {
             if (!format) videoformat = "mp4";
             typeSupported.push("mp4");
-        } 
-        if (MediaRecorder.isTypeSupported("video/mp4;codecs=avc1"))
-        {
+        }
+        if (MediaRecorder.isTypeSupported("video/mp4;codecs=avc1")) {
             if (!format) videoformat = "mp4";
             typeSupported.push("mp4_avc1");
-        } 
+        }
 
         return typeSupported;
     }
@@ -259,7 +213,7 @@ export async function ScreenRecord(instance, type, isUpload=false, format = "vid
             // Downloadin it onto the user's device
             let a = document.createElement('a')
             a.href = dataDownloadUrl;
-            a.download = `${filename}.${videoformat == "video/webm" ? "webm" :"mp4"}`
+            a.download = `${filename}.${videoformat == "video/webm" ? "webm" : "mp4"}`
             a.click()
 
             URL.revokeObjectURL(dataDownloadUrl)
