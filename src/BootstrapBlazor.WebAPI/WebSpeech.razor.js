@@ -1,6 +1,6 @@
 ﻿let speakBtn, el, utteranceCache, recognition;
 
-export async function SpeechRecognition(wrapper, lang) {
+export function SpeechRecognition(wrapper, lang) {
 
     if (!lang) lang = 'zh-CN';
 
@@ -62,7 +62,7 @@ export async function SpeechRecognition(wrapper, lang) {
     }
 
 }
-export async function SpeechRecognitionStop(wrapper) {
+export function SpeechRecognitionStop(wrapper) {
     try {
         if (recognition) {
             recognition.stop();
@@ -77,7 +77,7 @@ export async function SpeechRecognitionStop(wrapper) {
     return true;
 }
 
-export async function SpeechSynthesis(wrapper, text, lang, rate = 1, picth = 1, volume = 1, voiceURI = null) {
+export function SpeechSynthesis(wrapper, text, lang, rate = 1, picth = 1, volume = 1, voiceURI = null) {
     try {
         if (typeof speechSynthesis === "undefined") {
             wrapper.invokeMethodAsync('GetError', "Speech undefined");
@@ -110,10 +110,9 @@ export async function SpeechSynthesis(wrapper, text, lang, rate = 1, picth = 1, 
 
         // Speak the text
         speechSynthesis.speak(utterance);
-        let that = wrapper;
         setTimeout(() => {
             if (!speechSynthesis.speaking) {
-                that.invokeMethodAsync('GetError', '请点击初始化按钮');
+                wrapper.invokeMethodAsync('GetError', '请点击初始化按钮');
                 utteranceCache = utterance;
                 el.style.visibility = "visible";
                 speakBtn.addEventListener("click", talk, false);
@@ -125,7 +124,7 @@ export async function SpeechSynthesis(wrapper, text, lang, rate = 1, picth = 1, 
     }
 }
 
-export async function SpeechStop(wrapper) {
+export function SpeechStop(wrapper) {
     try {
         if (speechSynthesis.speaking) {
             speechSynthesis.cancel();
