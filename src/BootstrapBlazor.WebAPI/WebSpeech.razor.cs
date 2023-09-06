@@ -153,16 +153,22 @@ public partial class WebSpeech : IAsyncDisposable
         try
         {
             List<WebVoice> res = await module!.InvokeAsync<List<WebVoice>>("GetVoiceList");
-            if (res == null || res.Count == 0)
+            var retry = 0;
+            while (res == null || res.Count == 0)
             {
-                await Task.Delay(100);
+                await Task.Delay(200);
                 res = await module!.InvokeAsync<List<WebVoice>>("GetVoiceList", Instance);
-            }
+                retry++;
+                if (retry == 5)
+                {
+                    return null;
+                }
+            } 
             return orderByName ? (res?.OrderByDescending(a => a.LocalService).ThenBy(a => a.Name).ToList()) : res;
         }
         catch (Exception e)
         {
-            if (OnError != null) await OnError.Invoke(e.Message);
+            if (OnError != null) await OnError.Invoke("GetVoiceList:" + e.Message);
         }
         return null;
     }
