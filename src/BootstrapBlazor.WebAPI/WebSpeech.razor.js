@@ -1,4 +1,5 @@
 ﻿let speakBtn, el, utteranceCache, recognition;
+let inited = false;
 
 export function SpeechRecognition(wrapper, lang) {
 
@@ -24,7 +25,7 @@ export function SpeechRecognition(wrapper, lang) {
         console.log(v, i);
         colorHTML += '<span style="background-color:' + colorsEn[i] + ';"> ' + v + ' </span>';
     });
-    hints.innerHTML = '点击这个区域，然后说出一种颜色来更改应用程序的背景颜色<br/> ' + colorHTML + '.';
+    hints.innerHTML = '<h4>点击这个区域，然后说出一种颜色来更改应用程序的背景颜色<br/> ' + colorHTML + '.<h4>';
 
     hints.onclick = function () {
         recognition.start();
@@ -36,7 +37,7 @@ export function SpeechRecognition(wrapper, lang) {
         var color = event.results[0][0].transcript;
         wrapper.invokeMethodAsync('GetResult', color);
         diagnostic.textContent = '结果: ' + color;
-        var index = colors.indexOf(color);
+        var index = colors.indexOf(color.replace('.', '').replace('。', ''));
         if (index > -1) {
             color = colorsEn[index];
             diagnostic.textContent += '(' + color + ')';
@@ -77,6 +78,7 @@ export function SpeechRecognitionStop(wrapper) {
     return true;
 }
 
+let speechSynthesis = window.speechSynthesis;
 export function SpeechSynthesis(wrapper, text, lang, rate = 1, picth = 1, volume = 1, voiceURI = null) {
     try {
         if (typeof speechSynthesis === "undefined") {
@@ -110,14 +112,18 @@ export function SpeechSynthesis(wrapper, text, lang, rate = 1, picth = 1, volume
 
         // Speak the text
         speechSynthesis.speak(utterance);
-        setTimeout(() => {
-            if (!speechSynthesis.speaking) {
-                wrapper.invokeMethodAsync('GetError', '请点击初始化按钮');
-                utteranceCache = utterance;
-                el.style.visibility = "visible";
-                speakBtn.addEventListener("click", talk, false);
-            }
-        }, 100);
+        if (!inited) {
+            setTimeout(() => {
+                if (!speechSynthesis.speaking) {
+                    wrapper.invokeMethodAsync('GetError', '请点击初始化按钮');
+                    utteranceCache = utterance;
+                    el.style.visibility = "visible";
+                    speakBtn.addEventListener("click", talk, false);
+                } else {
+                    inited = true;
+                }
+            }, 100);
+        }
     } catch (error) {
         console.error(error);
         wrapper.invokeMethodAsync('GetError', error.message);
@@ -171,7 +177,7 @@ function talk() {
     el.style.visibility = "hidden";
     if (utteranceCache !== null) {
         speechSynthesis.speak(utteranceCache);
-    } else { 
+    } else {
         let u = new SpeechSynthesisUtterance();
         u.text = 'OK';
         speechSynthesis.speak(u);
@@ -181,6 +187,7 @@ function talk() {
             el.style.visibility = "visible";
             speakBtn.addEventListener("click", talk, false);
         } else {
+            inited = true;
             speakBtn.removeEventListener("click", talk);
         }
     }, 100);
