@@ -69,7 +69,6 @@ export function SpeechRecognitionStop(wrapper) {
             recognition.stop();
             wrapper.invokeMethodAsync('GetStatus', "停止识别");
         }
-        speakBtn.click();
     } catch (error) {
         console.error(error);
         wrapper.invokeMethodAsync('GetError', error.message);
