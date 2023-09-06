@@ -163,8 +163,15 @@ public partial class WebSpeech : IAsyncDisposable
                 {
                     return null;
                 }
-            } 
-            return orderByName ? (res?.OrderByDescending(a => a.LocalService).ThenBy(a => a.Name).ToList()) : res;
+            }
+            try
+            {
+                return orderByName ? (res?.OrderByDescending(a => a.LocalService).ThenBy(a => a.Lang).ThenBy(a => a.Name).ToList()) : res;
+            }
+            catch (Exception)
+            { 
+                return res;
+            }
         }
         catch (Exception e)
         {
