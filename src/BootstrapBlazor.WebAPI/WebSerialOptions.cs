@@ -14,7 +14,9 @@ namespace BootstrapBlazor.Components;
 /// </summary>
 public class WebSerialOptions
 {
-
+    /// <summary>
+    /// 波特率列表
+    /// </summary>
     [JsonIgnore]
     public static List<int> BaudRateList = new List<int> { 300, 600, 1200, 2400, 4800, 9600, 14400, 19200, 38400, 56000, 57600, 115200, 128000, 256000, 460800, 512000, 750000, 921600, 1500000 };
 
@@ -61,6 +63,17 @@ public class WebSerialOptions
     [DisplayName("校验")]
     public string? FlowControl { get => FlowControlType.ToString(); }
 
+    [DisplayName("HEX发送")]
+    public bool InputWithHex { get; set; }
+
+    [DisplayName("HEX接收")]
+    public bool OutputInHex { get; set; }
+
+    [DisplayName("自动断帧")]
+    public bool AutoFrameBreak { get; set; } = true;
+
+    [DisplayName("断帧字符(默认\\n)")]
+    public string? FrameBreakChar { get; set; } 
 
 }
 

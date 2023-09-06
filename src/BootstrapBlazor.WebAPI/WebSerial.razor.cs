@@ -20,6 +20,12 @@ public partial class WebSerial : IAsyncDisposable
     public ElementReference Element { get; set; }
 
     /// <summary>
+    /// 获得/设置 连接状态回调方法
+    /// </summary>
+    [Parameter]
+    public Func<bool, Task>? OnConnect { get; set; }
+
+    /// <summary>
     /// 获得/设置 错误回调方法
     /// </summary>
     [Parameter]
@@ -67,6 +73,7 @@ public partial class WebSerial : IAsyncDisposable
     public WebSerialOptions? Options { get; set; } = new WebSerialOptions();
 
     WebSerialOptions? OptionsCache { get; set; } 
+    bool IsConnected { get; set; } 
 
     protected override void OnInitialized()
     {
@@ -125,6 +132,18 @@ public partial class WebSerial : IAsyncDisposable
         catch 
         {
         }
+    }
+
+    /// <summary>
+    /// 连接状态
+    /// </summary>
+    /// <param name="msg"></param>
+    /// <returns></returns>
+    [JSInvokable]
+    public async Task Connect(bool flag)
+    {
+        IsConnected = flag;
+        if (OnConnect != null) await OnConnect.Invoke(flag);
     }
 
     /// <summary>

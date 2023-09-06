@@ -1,4 +1,6 @@
-﻿export async function Init(instance, element, options, command) {
+﻿let frameBreakChar = "\n"
+let autoFrameBreak = true;
+export async function Init(instance, element, options, command) {
     let port;
     let reader;
     let inputDone;
@@ -12,13 +14,22 @@
     const fname = element.querySelector("[data-action=fname]");
     const notSupported = element.querySelector('[data-action=notSupported]');
 
+    fname.style.visibility = "visible";
+    butwrite.style.visibility = "visible";
     butConnect.addEventListener("click", clickConnect);
     butwrite.addEventListener("click", write);
 
     if (notSupported) notSupported.classList.toggle('hidden', 'serial' in navigator);
 
+    if (!"serial" in navigator) {
+        instance.invokeMethodAsync('GetError', "The Web Serial API is not supported"); 
+        return;
+    }
 
     getPorts();
+
+    if (options.frameBreakChar) frameBreakChar = options.frameBreakChar;
+    autoFrameBreak = options.autoFrameBreak;
 
     async function getPorts() {
         let ports = await navigator.serial.getPorts();
@@ -46,54 +57,68 @@
         await writeToStream(fname.value);
     }
 
-    /**
-     * @name connect
-     * Opens a Web Serial connection to a micro:bit and sets up the input and
-     * output stream.
-     */
     async function connect() {
-        if (!port) {
-            const filters = [
-                { usbVendorId: 0x2A03, usbProductId: 0x0043 },
-                { usbVendorId: 0x2341, usbProductId: 0x0001 }
-            ];
-            // - Request a port and open a connection.
-            //port = await navigator.serial.requestPort({ filters });
-            port = await navigator.serial.requestPort();
-            const { usbProductId, usbVendorId } = port.getInfo();
-            console.log(usbProductId, usbVendorId);
-            instance.invokeMethodAsync('GetLog', usbProductId);
-       }
+        try {
+            if (!port) {
+                const filters = [
+                    { usbVendorId: 0x2A03, usbProductId: 0x0043 },
+                    { usbVendorId: 0x2341, usbProductId: 0x0001 }
+                ];
+                // - 请求端口并打开连接.
+                //port = await navigator.serial.requestPort({ filters });
+                port = await navigator.serial.requestPort();
+                const { usbProductId, usbVendorId } = port.getInfo();
+                console.log(usbProductId, usbVendorId);
+                instance.invokeMethodAsync('GetLog', usbProductId);
+            }
 
-        await open();
-        let decoder = new TextDecoderStream();
-        inputDone = port.readable.pipeTo(decoder.writable);
-        inputStream = decoder.readable
-            .pipeThrough(new TransformStream(new LineBreakTransformer()));
+            await open();
+            let decoder = new TextDecoderStream();
+            if (!options.outputInHex) {
+                inputDone = port.readable.pipeTo(decoder.writable);
+                if (autoFrameBreak) {
+                    inputStream = decoder.readable
+                    .pipeThrough(new TransformStream(new LineBreakTransformer()));
+                } else {
+                    inputStream = decoder.readable;
+                } 
+                reader = inputStream.getReader();
+            } else {
+                reader = port.readable.getReader();
+            }
+            readLoop();
 
-        reader = inputStream.getReader();
-        readLoop();
-
-        const encoder = new TextEncoderStream();
-        outputDone = encoder.readable.pipeTo(port.writable);
-        outputStream = encoder.writable;
+            const encoder = new TextEncoderStream();
+            outputDone = encoder.readable.pipeTo(port.writable);
+            outputStream = encoder.writable;
+            instance.invokeMethodAsync('Connect', true);
+       } catch (error) {
+            console.error(error);
+            instance.invokeMethodAsync('GetError', error.message);
+        }
     }
 
     async function disconnect() {
-        if (reader) {
-            await reader.cancel();
-            await inputDone.catch(() => { });
-            reader = null;
-            inputDone = null;
+        try {
+            if (reader) {
+                await reader.cancel();
+                if (!options.outputInHex) await inputDone.catch(() => { });
+                reader = null;
+                inputDone = null;
+            }
+            if (outputStream) {
+                await outputStream.getWriter().close();
+                await outputDone;
+                outputStream = null;
+                outputDone = null;
+            }
+            await port.close();
+            port = null;
+            instance.invokeMethodAsync('Connect', false);
+       } catch (error) {
+            console.error(error);
+            instance.invokeMethodAsync('GetError', error.message);
         }
-        if (outputStream) {
-            await outputStream.getWriter().close();
-            await outputDone;
-            outputStream = null;
-            outputDone = null;
-        }
-        await port.close();
-        port = null;
     }
 
     async function clickConnect() {
@@ -110,8 +135,8 @@
         while (true) {
             const { value, done } = await reader.read();
             if (value) {
-                if (log) log.textContent +='收到数据: '+ value + '\n';
-                instance.invokeMethodAsync('ReceiveData', value+"");
+                if (log) log.textContent += '收到数据: ' + value + '\n';
+                instance.invokeMethodAsync('ReceiveData', value + "");
             }
             if (done) {
                 console.log('[readLoop] DONE', done);
@@ -124,8 +149,8 @@
 
     /**
      * @name writeToStream
-     * Gets a writer from the output stream and send the lines to the micro:bit.
-     * @param  {...string} lines lines to send to the micro:bit
+     * 从输出流获取 writer 并将行发送到 micro:bit.
+     * @param  {...string} lines 行发送到 micro:bit
      */
     async function writeToStream(...lines) {
         const writer = outputStream.getWriter();
@@ -137,31 +162,32 @@
         });
         writer.releaseLock();
     }
-     
+
     /**
      * @name LineBreakTransformer
-     * TransformStream to parse the stream into lines.
+     * Transform Stream 将流解析为行.
      */
     class LineBreakTransformer {
         constructor() {
-            // A container for holding stream data until a new line.
+            // 用于保存流数据直到新行的容器。
             this.chunks = "";
         }
 
         transform(chunk, controller) {
-            // Append new chunks to existing chunks.
-            this.chunks += chunk+"";
-            // For each line breaks in chunks, send the parsed lines out.
-            const lines = this.chunks.split("\r\n");
+            console.log('[GET]', chunk);
+            // 将新块附加到现有块。
+            this.chunks += chunk + "";
+            // 对于块中的每个换行符，将解析后的行发送出去。
+            const lines = this.chunks.split(frameBreakChar);
             this.chunks = lines.pop();
             lines.forEach((line) => controller.enqueue(line));
         }
 
         flush(controller) {
-            // When the stream is closed, flush any remaining chunks out.
+            // 当流关闭时，刷新所有剩余的块。
             controller.enqueue(this.chunks);
         }
-    } 
+    }
 
     function toggleUIConnected(connected) {
         let lbl = "连接";
