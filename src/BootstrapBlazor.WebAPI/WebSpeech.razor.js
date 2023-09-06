@@ -81,6 +81,9 @@ export function SpeechRecognitionStop(wrapper) {
 let speechSynthesis = window.speechSynthesis;
 export function SpeechSynthesis(wrapper, text, lang, rate = 1, picth = 1, volume = 1, voiceURI = null) {
     try {
+        if (!wrapper) {
+            return;
+        }
         if (typeof speechSynthesis === "undefined") {
             wrapper.invokeMethodAsync('GetError', "Speech undefined");
             return;

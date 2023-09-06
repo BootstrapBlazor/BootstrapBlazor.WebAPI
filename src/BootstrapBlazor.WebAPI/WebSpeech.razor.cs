@@ -70,6 +70,12 @@ public partial class WebSpeech : IAsyncDisposable
         if (OnResult != null) await OnResult.Invoke(val);
     }
 
+    [JSInvokable]
+    public async Task GetError(string err)
+    {
+        if (OnError != null) await OnError.Invoke(err);
+    }
+
     /// <summary>
     /// 初始化语音
     /// </summary>
@@ -152,7 +158,7 @@ public partial class WebSpeech : IAsyncDisposable
     {
         try
         {
-            List<WebVoice> res = await module!.InvokeAsync<List<WebVoice>>("GetVoiceList");
+            List<WebVoice> res = await module!.InvokeAsync<List<WebVoice>>("GetVoiceList", Instance);
             var retry = 0;
             while (res == null || res.Count == 0)
             {
