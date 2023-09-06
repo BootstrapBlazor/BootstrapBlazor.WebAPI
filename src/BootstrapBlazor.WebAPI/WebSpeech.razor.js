@@ -1,5 +1,6 @@
 ﻿let speakBtn, el, utteranceCache, recognition;
 let inited = false;
+let speechSynthesis = window.speechSynthesis || window.mozspeechSynthesis || window.webkitspeechSynthesis;
 
 export function SpeechRecognition(wrapper, lang) {
 
@@ -28,6 +29,9 @@ export function SpeechRecognition(wrapper, lang) {
     hints.innerHTML = '<h4>点击这个区域，然后说出一种颜色来更改应用程序的背景颜色<br/> ' + colorHTML + '.<h4>';
 
     hints.onclick = function () {
+        if (recognition) {
+            recognition.stop();
+        }
         recognition.start();
         console.log('开始识别.');
         wrapper.invokeMethodAsync('GetStatus', "开始识别");
@@ -52,7 +56,7 @@ export function SpeechRecognition(wrapper, lang) {
         recognition.stop();
     }
 
-    recognition.onnomatch = function (event) {
+    recognition.onnomatch = function () {
         diagnostic.textContent = "不能识别.";
         wrapper.invokeMethodAsync('GetStatus', "不能识别");
     }
@@ -77,7 +81,6 @@ export function SpeechRecognitionStop(wrapper) {
     return true;
 }
 
-let speechSynthesis = window.speechSynthesis;
 export function SpeechSynthesis(wrapper, text, lang, rate = 1, picth = 1, volume = 1, voiceURI = null) {
     try {
         if (!wrapper) {
@@ -165,7 +168,6 @@ export async function GetVoiceList(wrapper) {
     }
     return list;
 }
-
 
 export function InitWebapi(wrapper, element) {
     el = element;

@@ -40,6 +40,7 @@ public partial class WebSpeech : IAsyncDisposable
     /// </summary>
     [Parameter]
     public bool ShowSpeechInfo { get; set; }
+    public bool SpeechUndefined { get; set; }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -73,6 +74,11 @@ public partial class WebSpeech : IAsyncDisposable
     [JSInvokable]
     public async Task GetError(string err)
     {
+        if (err == "Speech undefined")
+        {
+            SpeechUndefined = true;
+        }
+
         if (OnError != null) await OnError.Invoke(err);
     }
 
@@ -153,19 +159,18 @@ public partial class WebSpeech : IAsyncDisposable
             if (OnError != null) await OnError.Invoke(e.Message);
         }
     }
-
     public virtual async Task<List<WebVoice>?> GetVoiceList(bool orderByName = false)
     {
         try
         {
             List<WebVoice> res = await module!.InvokeAsync<List<WebVoice>>("GetVoiceList", Instance);
             var retry = 0;
-            while (res == null || res.Count == 0)
+            while ((res == null || res.Count == 0) && !SpeechUndefined)
             {
                 await Task.Delay(200);
                 res = await module!.InvokeAsync<List<WebVoice>>("GetVoiceList", Instance);
                 retry++;
-                if (retry == 5)
+                if (retry == 5|| SpeechUndefined)
                 {
                     return null;
                 }
