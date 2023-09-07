@@ -2,7 +2,7 @@
 let inited = false;
 let speechSynthesis = window.speechSynthesis || window.mozspeechSynthesis || window.webkitspeechSynthesis;
 
-export function SpeechRecognitionDemo(wrapper, lang) {
+export function SpeechRecognitionDemo(wrapper, lang, continuous = false, interimResults = false) {
 
     if (!lang) lang = 'zh-CN';
 
@@ -18,9 +18,9 @@ export function SpeechRecognitionDemo(wrapper, lang) {
     const speechRecognitionList = new SpeechGrammarList();
     speechRecognitionList.addFromString(colors, 1);
     recognition.grammars = speechRecognitionList;
-    recognition.continuous = false;
+    recognition.continuous = continuous;
     recognition.lang = lang;
-    recognition.interimResults = false;
+    recognition.interimResults = interimResults;
     recognition.maxAlternatives = 1;
 
     var diagnostic = document.querySelector('.output');
@@ -99,7 +99,7 @@ export function SpeechRecognition(wrapper, lang, continuous = false, interimResu
             var result = '';
             event.results.forEach(function (v, i, a) {
                 result += v[0].transcript + ',';
-                console.log('结果: ' + v[0].transcript + ',匹配率: ' + v[0].confidence);
+                console.log('多结果: ' + v[0].transcript + ',匹配率: ' + v[0].confidence);
             });
             wrapper.invokeMethodAsync('GetResult', result);
             wrapper.invokeMethodAsync('GetStatus', '结果: ' + result);

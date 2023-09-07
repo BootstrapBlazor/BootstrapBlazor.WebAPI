@@ -5,7 +5,6 @@
 // **********************************
 
 
-using System;
 using System.ComponentModel;
 using System.Text.Json.Serialization;
 
@@ -14,25 +13,50 @@ namespace BootstrapBlazor.Components;
 public class SpeechRecognitionOption
 {
     /// <summary>
-    /// 每次识别返回连续结果，还是仅返回单个结果。默认为单个 false
+    /// 持续识别,需手动停止。默认为单次识别 false
     /// </summary>
     /// <returns></returns>
-    [DisplayName("单个/连续")] 
+    [DisplayName("持续识别,需手动停止")]
     public bool Continuous { get; set; }
 
     /// <summary>
-    /// 返回临时结果。默认为 false
+    /// 返回临时结果(打字机效果)。默认为 false
     /// </summary>
     /// <returns></returns>
-    [DisplayName("返回临时结果")] 
+    [DisplayName("返回临时结果,打字机效果")]
     public bool InterimResults { get; set; }
 
     /// <summary>
     /// 返回结果数量。默认值为 1
     /// </summary>
     /// <returns></returns>
-    [DisplayName("返回结果数量")] 
-    public int MaxAlternatives { get; set; } = 1; 
+    [DisplayName("返回结果数量")]
+    public int MaxAlternatives { get; set; } = 1;
+
+}
+
+public class SpeechSynthesisOption
+{
+    /// <summary>
+    /// 速率, 范围可以在 0.1（最低）和 10（最高）之间
+    /// </summary>
+    /// <returns></returns>
+    [DisplayName("速率")]
+    public double Rate { get; set; } = 1;
+
+    /// <summary>
+    /// 音高,范围可以在 0（最低）和 2（最高）之间
+    /// </summary>
+    /// <returns></returns>
+    [DisplayName("音高")]
+    public double Picth { get; set; } = 1;
+
+    /// <summary>
+    /// 音量, 浮点数，介于 0（最低）和 1（最高）之间
+    /// </summary>
+    /// <returns></returns>
+    [DisplayName("音量")]
+    public double Volume { get; set; } = 1;
 
 }
 

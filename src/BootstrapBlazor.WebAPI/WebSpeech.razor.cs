@@ -53,7 +53,7 @@ public partial class WebSpeech : IAsyncDisposable
                 module = await JS!.InvokeAsync<IJSObjectReference>("import", "./_content/BootstrapBlazor.WebAPI/WebSpeech.razor.js" + "?v=" + System.Reflection.Assembly.GetExecutingAssembly().GetName().Version);
                 Instance = DotNetObjectReference.Create(this);
                 await InitWebapi();
-            } 
+            }
         }
         catch (Exception e)
         {
@@ -117,11 +117,11 @@ public partial class WebSpeech : IAsyncDisposable
     /// <param name="interimResults">返回临时结果。默认为 false</param>
     /// <param name="maxAlternatives">返回结果数量。默认值为 1</param>
     /// <returns></returns>
-    public virtual async Task<string> SpeechRecognition(string lang = "zh-CN", bool continuous = false, bool interimResults = false, int maxAlternatives = 1)  
+    public virtual async Task<string> SpeechRecognition(string lang = "zh-CN", bool continuous = false, bool interimResults = false, int maxAlternatives = 1)
     {
         try
         {
-            return await module!.InvokeAsync<string>("SpeechRecognition", Instance, lang,  continuous  ,   interimResults  ,  maxAlternatives);
+            return await module!.InvokeAsync<string>("SpeechRecognition", Instance, lang, continuous, interimResults, maxAlternatives);
         }
         catch (Exception e)
         {
@@ -134,17 +134,30 @@ public partial class WebSpeech : IAsyncDisposable
     /// 语音识别Demo
     /// </summary>
     /// <returns></returns>
-    public virtual async Task<string> SpeechRecognitionDemo(string lang = "zh-CN")
+    public virtual async Task<string> SpeechRecognitionDemo(string lang = "zh-CN", SpeechRecognitionOption? option = null)
     {
         try
         {
-            return await module!.InvokeAsync<string>("SpeechRecognitionDemo", Instance, lang);
+            option = option ?? new SpeechRecognitionOption();
+            return await module!.InvokeAsync<string>("SpeechRecognitionDemo", Instance, lang, option.Continuous,option.InterimResults);
         }
         catch (Exception e)
         {
             if (OnError != null) await OnError.Invoke(e.Message);
             return e.Message;
         }
+    }
+
+    /// <summary>
+    /// 语音合成（文字转语音）
+    /// </summary>
+    /// <param name="text">文字</param>
+    /// <param name="lang">语言</param>
+    /// <returns></returns>
+    public virtual async Task SpeechSynthesis(string text, SpeechSynthesisOption? option, string lang = "zh-CN", string? voiceURI = null)
+    {
+        option = option ?? new SpeechSynthesisOption();
+        await SpeechSynthesis(text, lang, option.Rate, option.Picth, option.Volume, voiceURI);
     }
 
     /// <summary>
@@ -222,7 +235,7 @@ public partial class WebSpeech : IAsyncDisposable
                 await Task.Delay(200);
                 res = await module!.InvokeAsync<List<WebVoice>>("GetVoiceList", Instance);
                 retry++;
-                if (retry == 5|| SpeechUndefined)
+                if (retry == 5 || SpeechUndefined)
                 {
                     return null;
                 }
@@ -232,7 +245,7 @@ public partial class WebSpeech : IAsyncDisposable
                 return orderByName ? (res?.OrderByDescending(a => a.LocalService).ThenBy(a => a.Lang).ThenBy(a => a.Name).ToList()) : res;
             }
             catch (Exception)
-            { 
+            {
                 return res;
             }
         }
@@ -252,6 +265,6 @@ public partial class WebSpeech : IAsyncDisposable
         }
     }
 
-    
+
 
 }
