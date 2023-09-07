@@ -4,7 +4,9 @@
 // e-mail:zhouchuanglin@gmail.com 
 // **********************************
 
+using Microsoft.AspNetCore.Components;
 using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
 using System.Text.Json.Serialization;
 
 namespace BootstrapBlazor.Components;
@@ -32,6 +34,12 @@ public class WebSerialOptions
     public int? DataBits { get; set; } = 8;
 
     /// <summary>
+    /// 停止位, 1 或 2。默认为1。
+    /// </summary>
+    [DisplayName("停止位")]
+    public int? StopBits { get; set; } = 1;
+
+    /// <summary>
     /// 流控制, none、even、odd。默认 "none"。
     /// </summary>
     [JsonIgnore]
@@ -42,12 +50,6 @@ public class WebSerialOptions
     public string? Parity { get => ParityType.ToString(); }
 
     /// <summary>
-    /// 停止位, 1 或 2。默认为1。
-    /// </summary>
-    [DisplayName("停止位")]
-    public int? StopBits { get; set; } = 1;
-
-    /// <summary>
     /// 读写缓冲区。默认 255
     /// </summary>
     [DisplayName("读写缓冲区")]
@@ -56,24 +58,83 @@ public class WebSerialOptions
     /// <summary>
     /// 校验位, "none"或"hardware"。默认值为"none"。
     /// </summary>
-    [JsonIgnore]
     [DisplayName("校验")]
     public WebSerialParityType? FlowControlType { get; set; } = WebSerialParityType.none;
 
     [DisplayName("校验")]
     public string? FlowControl { get => FlowControlType.ToString(); }
 
+    /// <summary>
+    /// HEX发送
+    /// </summary>
     [DisplayName("HEX发送")]
     public bool InputWithHex { get; set; }
 
+    /// <summary>
+    /// HEX接收
+    /// </summary>
     [DisplayName("HEX接收")]
     public bool OutputInHex { get; set; }
 
-    [DisplayName("自动断帧")]
-    public bool AutoFrameBreak { get; set; } = true;
+    /// <summary>
+    /// 自动连接设备
+    /// </summary>
+    [DisplayName("自动连接设备")]
+    public bool AutoConnect { get; set; } = true;
 
+    /// <summary>
+    /// 自动断帧方式
+    /// </summary>
+    [JsonIgnore]
+    [DisplayName("自动断帧方式")]
+    public AutoFrameBreakType AutoFrameBreakType { get; set; } = AutoFrameBreakType.Character;
+
+    [DisplayName("自动断帧方式")]
+    public string? autoFrameBreak { get => AutoFrameBreakType.ToString(); }
+
+    /// <summary>
+    /// 断帧字符(默认\n)
+    /// </summary>
     [DisplayName("断帧字符(默认\\n)")]
-    public string? FrameBreakChar { get; set; } 
+    public string? FrameBreakChar { get; set; }
+
+    /// <summary>
+    /// 中断 (未完成)
+    /// </summary>
+    [DisplayName("中断(未完成)")] 
+    public bool Break { get; set; }
+
+    /// <summary>
+    /// 数据终端就绪 (未完成)
+    /// </summary>
+    [JsonPropertyName("DTR")]
+    [DisplayName("DTR(未完成)")]
+    public bool DTR { get; set; }
+
+    /// <summary>
+    /// 请求发送 (未完成)
+    /// </summary>
+    [JsonPropertyName("RTS")]
+    [DisplayName("RTS(未完成)")]
+    public bool RTS { get; set; } 
+
+    /// <summary>
+    /// 连接按钮文本/Connect button title
+    /// </summary>
+    [DisplayName("连接按钮文本")]
+    public string? ConnectBtnTitle { get; set; } = "连接";
+
+    /// <summary>
+    /// 断开连接按钮文本/Connect button title
+    /// </summary>
+    [DisplayName("断开连接按钮文本")]
+    public string? DisconnectBtnTitle { get; set; } = "断开连接";
+
+    /// <summary>
+    /// 写入按钮文本/Write button title
+    /// </summary>
+    [DisplayName("写入按钮文本")]
+    public string? WriteBtnTitle { get; set; } = "写入";
 
 }
 
@@ -111,4 +172,41 @@ public enum WebSerialFlowControlType
     /// </summary>
     [Description("硬件")]
     hardware,
+}
+
+/// <summary>
+/// 自动断帧方式
+/// </summary>
+public enum AutoFrameBreakType
+{
+    /// <summary>
+    /// 未启用自动断帧
+    /// </summary>
+    [Description("未启用")]
+    none,
+
+    /// <summary>
+    /// 字符断帧
+    /// </summary>
+    [Description("字符断帧")]
+    Character,
+
+    /// <summary>
+    /// 空闲中断 (未完成)
+    /// </summary>
+    [Description("空闲中断(未完成)")]
+    Timeout,
+
+    /// <summary>
+    /// 帧头、帧尾 (未实现)
+    /// <para></para>例如: 帧头（AA 、BB） + 数据长度 + 数据  + CRC校验 + 帧尾（CC、DD）
+    /// </summary>
+    [Description("帧头帧尾(未实现)")]
+    FrameTail,
+
+    /// <summary>
+    /// 字符间隔 (未实现)
+    /// </summary>
+    [Description("字符间隔(未实现)")]
+    CharacterInterval,
 }

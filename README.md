@@ -1,4 +1,4 @@
-# Blazor WebAPI 组件 (浏览器信息/电池信息/网络信息/截屏/录像/上传/Cookie/LocalStorage/WebSerial)
+# Blazor WebAPI 组件 (浏览器信息/电池信息/网络信息/截屏/录像/上传/Cookie/LocalStorage/WebSerial/语音识别和合成)
 
 1. 电池信息类
 2. 网络信息类
@@ -18,6 +18,8 @@ https://blazor.app1.es/Storages
 https://blazor.app1.es/UploadToBase64s
 
 https://blazor.app1.es/WebSerials
+
+https://blazor.app1.es/Speechs
 
 使用方法:
 
@@ -99,6 +101,9 @@ v7.2.7 - 7.3.4
 
 v7.3.5
 - WebSerial 添加 连接状态/HEX发送/HEX接收/自动断帧/断帧字符
+
+v7.3.6
+- WebSerial 添加 自动连接设备/自动断帧方式/Break/DTR/RTS/按钮文本自定义
 ---
 #### Blazor 组件
 

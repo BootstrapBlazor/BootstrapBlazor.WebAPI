@@ -47,14 +47,18 @@ public partial class WebSerial : IAsyncDisposable
     /// 连接按钮文本/Connect button title
     /// </summary>
     [Parameter]
-    [NotNull]
     public string? ConnectBtnTitle { get; set; }
+
+    /// <summary>
+    /// 断开连接按钮文本/Connect button title
+    /// </summary>
+    [Parameter]
+    public string? DisconnectBtnTitle { get; set; }
 
     /// <summary>
     /// 写入按钮文本/Write button title
     /// </summary>
     [Parameter]
-    [NotNull]
     public string? WriteBtnTitle { get; set; }
 
     /// <summary>
@@ -70,21 +74,26 @@ public partial class WebSerial : IAsyncDisposable
     public bool Debug { get; set; }
 
     [Parameter]
-    public WebSerialOptions? Options { get; set; } = new WebSerialOptions();
+    public WebSerialOptions Options { get; set; } = new WebSerialOptions();
 
     WebSerialOptions? OptionsCache { get; set; } 
     bool IsConnected { get; set; } 
 
     protected override void OnInitialized()
     {
-        ConnectBtnTitle = ConnectBtnTitle ?? "连接";
-        WriteBtnTitle = WriteBtnTitle ?? "写入";
+        Options.ConnectBtnTitle = ConnectBtnTitle ?? Options.ConnectBtnTitle ?? "连接";
+        Options.DisconnectBtnTitle = DisconnectBtnTitle ?? Options.DisconnectBtnTitle ?? "断开连接";
+        Options.WriteBtnTitle = WriteBtnTitle ?? Options.WriteBtnTitle ?? "写入";
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         try
         {
+            Options.ConnectBtnTitle = ConnectBtnTitle ?? Options.ConnectBtnTitle ?? "连接";
+            Options.DisconnectBtnTitle = DisconnectBtnTitle ?? Options.DisconnectBtnTitle ?? "断开连接";
+            Options.WriteBtnTitle = WriteBtnTitle ?? Options.WriteBtnTitle ?? "写入";
+
             if (firstRender)
             {
                 module = await JS!.InvokeAsync<IJSObjectReference>("import", "./_content/BootstrapBlazor.WebAPI/WebSerial.razor.js" + "?v=" + System.Reflection.Assembly.GetExecutingAssembly().GetName().Version);
@@ -128,6 +137,20 @@ public partial class WebSerial : IAsyncDisposable
         try
         {
             await module!.InvokeVoidAsync("Init", Instance, Element, Options, "Start");
+        }
+        catch 
+        {
+        }
+    }
+
+    /// <summary>
+    /// 撤销对串行端口的访问
+    /// </summary>
+    public virtual async Task forget()
+    {
+        try
+        {
+            await module!.InvokeVoidAsync("forget", Instance);
         }
         catch 
         {
