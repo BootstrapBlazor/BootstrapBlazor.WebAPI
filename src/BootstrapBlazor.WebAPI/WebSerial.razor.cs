@@ -6,7 +6,7 @@ using System.Diagnostics.CodeAnalysis;
 namespace BootstrapBlazor.Components;
 
 /// <summary>
-/// 浏览器 WebSerial
+/// 串口读写 WebSerial
 /// </summary>
 public partial class WebSerial : IAsyncDisposable
 {
