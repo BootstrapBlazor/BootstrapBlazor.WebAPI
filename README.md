@@ -94,16 +94,20 @@ v7.2
 - Capture 组件优化
 
 v7.2.4
-- 添加 WebSerial
+- 添加 串口读写 WebSerial组件
 
 v7.2.7 - 7.3.4
-- 添加 语音识别/合成
+- 添加 WebSpeech 语音识别/合成组件
 
 v7.3.5
 - WebSerial 添加 连接状态/HEX发送/HEX接收/自动断帧/断帧字符
 
 v7.3.6
 - WebSerial 添加 自动连接设备/自动断帧方式/Break/DTR/RTS/按钮文本自定义
+
+v7.4.0
+- WebSpeech 语音识别优化
+
 ---
 #### Blazor 组件
 
