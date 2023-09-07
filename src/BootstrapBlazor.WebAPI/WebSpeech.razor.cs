@@ -40,7 +40,9 @@ public partial class WebSpeech : IAsyncDisposable
     /// </summary>
     [Parameter]
     public bool ShowSpeechInfo { get; set; }
+
     public bool SpeechUndefined { get; set; }
+    public bool IsBusy { get; set; }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -101,11 +103,42 @@ public partial class WebSpeech : IAsyncDisposable
     /// 语音识别
     /// </summary>
     /// <returns></returns>
-    public virtual async Task<string> SpeechRecognition(string lang = "zh-CN")
+    public virtual async Task<string> SpeechRecognition(string lang = "zh-CN", SpeechRecognitionOption? option = null)
+    {
+        option = option ?? new SpeechRecognitionOption();
+        return await SpeechRecognition(lang, option.Continuous, option.InterimResults, option.MaxAlternatives);
+    }
+
+    /// <summary>
+    /// 语音识别
+    /// </summary>
+    /// <param name="lang">设置当前的语言</param>
+    /// <param name="continuous">每次识别返回连续结果，还是仅返回单个结果。默认为单个 false</param>
+    /// <param name="interimResults">返回临时结果。默认为 false</param>
+    /// <param name="maxAlternatives">返回结果数量。默认值为 1</param>
+    /// <returns></returns>
+    public virtual async Task<string> SpeechRecognition(string lang = "zh-CN", bool continuous = false, bool interimResults = false, int maxAlternatives = 1)  
     {
         try
         {
-            return await module!.InvokeAsync<string>("SpeechRecognition", Instance, lang);
+            return await module!.InvokeAsync<string>("SpeechRecognition", Instance, lang,  continuous  ,   interimResults  ,  maxAlternatives);
+        }
+        catch (Exception e)
+        {
+            if (OnError != null) await OnError.Invoke(e.Message);
+            return e.Message;
+        }
+    }
+
+    /// <summary>
+    /// 语音识别Demo
+    /// </summary>
+    /// <returns></returns>
+    public virtual async Task<string> SpeechRecognitionDemo(string lang = "zh-CN")
+    {
+        try
+        {
+            return await module!.InvokeAsync<string>("SpeechRecognitionDemo", Instance, lang);
         }
         catch (Exception e)
         {
@@ -159,6 +192,25 @@ public partial class WebSpeech : IAsyncDisposable
             if (OnError != null) await OnError.Invoke(e.Message);
         }
     }
+
+    /// <summary>
+    /// 状态
+    /// </summary>
+    /// <param name="msg"></param>
+    /// <returns></returns>
+    [JSInvokable]
+    public async Task Busy(bool flag)
+    {
+        IsBusy = flag;
+        if (OnIsBusy != null) await OnIsBusy.Invoke(flag);
+    }
+
+    /// <summary>
+    /// 获得/设置 状态回调方法
+    /// </summary>
+    [Parameter]
+    public Func<bool, Task>? OnIsBusy { get; set; }
+
     public virtual async Task<List<WebVoice>?> GetVoiceList(bool orderByName = false)
     {
         try

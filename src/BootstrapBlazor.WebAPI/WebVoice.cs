@@ -11,6 +11,31 @@ using System.Text.Json.Serialization;
 
 namespace BootstrapBlazor.Components;
 
+public class SpeechRecognitionOption
+{
+    /// <summary>
+    /// 每次识别返回连续结果，还是仅返回单个结果。默认为单个 false
+    /// </summary>
+    /// <returns></returns>
+    [DisplayName("单个/连续")] 
+    public bool Continuous { get; set; }
+
+    /// <summary>
+    /// 返回临时结果。默认为 false
+    /// </summary>
+    /// <returns></returns>
+    [DisplayName("返回临时结果")] 
+    public bool InterimResults { get; set; }
+
+    /// <summary>
+    /// 返回结果数量。默认值为 1
+    /// </summary>
+    /// <returns></returns>
+    [DisplayName("返回结果数量")] 
+    public int MaxAlternatives { get; set; } = 1; 
+
+}
+
 /// <summary>
 /// Voice
 /// </summary>

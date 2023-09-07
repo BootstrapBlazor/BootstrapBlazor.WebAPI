@@ -2,7 +2,7 @@
 let inited = false;
 let speechSynthesis = window.speechSynthesis || window.mozspeechSynthesis || window.webkitspeechSynthesis;
 
-export function SpeechRecognition(wrapper, lang) {
+export function SpeechRecognitionDemo(wrapper, lang) {
 
     if (!lang) lang = 'zh-CN';
 
@@ -12,7 +12,12 @@ export function SpeechRecognition(wrapper, lang) {
 
     var colorsEn = ['aqua', 'azure', 'beige', 'bisque', 'black', 'blue', 'brown', 'chocolate', 'coral', 'crimson', 'cyan', 'fuchsia', 'ghostwhite', 'gold', 'goldenrod', 'gray', 'green', 'indigo', 'ivory', 'khaki', 'lavender', 'lime', 'linen', 'magenta', 'maroon', 'moccasin', 'navy', 'olive', 'orange', 'orchid', 'peru', 'pink', 'plum', 'purple', 'red', 'salmon', 'sienna', 'silver', 'snow', 'tan', 'teal', 'thistle', 'tomato', 'turquoise', 'violet', 'white', 'yellow'];
 
+    var SpeechGrammarList = SpeechGrammarList || webkitSpeechGrammarList
+
     recognition = new SpeechRecognition();
+    const speechRecognitionList = new SpeechGrammarList();
+    speechRecognitionList.addFromString(colors, 1);
+    recognition.grammars = speechRecognitionList;
     recognition.continuous = false;
     recognition.lang = lang;
     recognition.interimResults = false;
@@ -54,6 +59,7 @@ export function SpeechRecognition(wrapper, lang) {
 
     recognition.onspeechend = function () {
         recognition.stop();
+        wrapper.invokeMethodAsync('GetStatus', "识别停止");
     }
 
     recognition.onnomatch = function () {
@@ -67,10 +73,84 @@ export function SpeechRecognition(wrapper, lang) {
     }
 
 }
+
+export function SpeechRecognition(wrapper, lang, continuous = false, interimResults = false, maxAlternatives = 1) {
+
+    if (!lang) lang = 'zh-CN';
+
+    var SpeechRecognition = SpeechRecognition || webkitSpeechRecognition
+
+    recognition = new SpeechRecognition();
+    recognition.continuous = continuous;
+    recognition.lang = lang;
+    recognition.interimResults = interimResults;
+    recognition.maxAlternatives = maxAlternatives;
+
+    if (recognition) {
+        recognition.stop();
+    }
+    recognition.start();
+    console.log('开始识别.' + lang);
+    wrapper.invokeMethodAsync('GetStatus', "开始识别");
+    wrapper.invokeMethodAsync('Busy', true);
+
+    recognition.onresult = function (event) {
+        if (maxAlternatives > 1 && event.results.count > 1) {
+            var result = '';
+            event.results.forEach(function (v, i, a) {
+                result += v[0].transcript + ',';
+                console.log('结果: ' + v[0].transcript + ',匹配率: ' + v[0].confidence);
+            });
+            wrapper.invokeMethodAsync('GetResult', result);
+            wrapper.invokeMethodAsync('GetStatus', '结果: ' + result);
+
+        } else {
+            var result = event.results[0][0].transcript;
+            wrapper.invokeMethodAsync('GetResult', result);
+            console.log('结果: ' + result + ',匹配率: ' + event.results[0][0].confidence);
+            wrapper.invokeMethodAsync('GetStatus', '结果: ' + result + ',匹配率: ' + event.results[0][0].confidence);
+        }
+        return result;
+    }
+
+    // recognition.onaudiostart = function () {
+    //     recognition.stop();
+    //     wrapper.invokeMethodAsync('GetStatus', "开始捕获音频");
+    // }
+
+    // recognition.onspeechstart = function () {
+    //     wrapper.invokeMethodAsync('GetStatus', "检测到语音");
+    // }
+
+    // recognition.onspeechend = function () {
+    //     wrapper.invokeMethodAsync('GetStatus', "停止检测语音");
+    // }
+
+    // recognition.onaudioend = function () {
+    //     wrapper.invokeMethodAsync('GetStatus', "完成音频捕获");
+    //}
+
+    recognition.onspeechend = function () {
+        recognition.stop();
+        wrapper.invokeMethodAsync('Busy', false);
+        wrapper.invokeMethodAsync('GetStatus', "识别停止");
+    }
+
+    recognition.onnomatch = function () {
+        wrapper.invokeMethodAsync('GetStatus', "不能识别");
+    }
+
+    recognition.onerror = function (event) {
+        wrapper.invokeMethodAsync('GetError', event.error);
+    }
+
+}
+
 export function SpeechRecognitionStop(wrapper) {
     try {
         if (recognition) {
             recognition.stop();
+            wrapper.invokeMethodAsync('Busy', false);
             wrapper.invokeMethodAsync('GetStatus', "停止识别");
         }
     } catch (error) {
