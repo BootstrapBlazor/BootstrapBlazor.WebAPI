@@ -1,4 +1,4 @@
-﻿let port;
+﻿let port, refreshIntervalId;
 export async function Init(instance, element, options, command) {
     let reader;
     let inputDone;
@@ -164,9 +164,8 @@ export async function Init(instance, element, options, command) {
     async function readLoop() {
         while (true) {
             if (options.autoGetSignals) {
-                setInterval(async () => {
-                    console.log("[getSignals]");
-                    await getSignals(instance);
+                refreshIntervalId =setInterval(async () => {
+                    await getSignals(instance, false);
                 }, 300);
             }
             let result;
@@ -191,6 +190,7 @@ export async function Init(instance, element, options, command) {
                 console.log("[readLoop] DONE", done);
                 instance.invokeMethodAsync("GetLog", `接收数据完成: ${done}`);
                 reader.releaseLock();
+                clearInterval(refreshIntervalId);
                 break;
             }
         }
@@ -313,15 +313,16 @@ export async function setDTR_Demo() {
     console.log(`Ring Indicator:      ${signals.ringIndicator}`);
 }
 
-export async function getSignals(instance) {
+export async function getSignals(instance, debug=true) {
     try {
         let signals = await port.getSignals();
 
-        console.log(`RING (Ring Indicator) :      ${signals.ringIndicator}`);
-        console.log(`DSR (Data Set Ready):        ${signals.dataSetReady}`);
-        console.log(`CTS (Clear To Send):         ${signals.clearToSend}`);
-        console.log(`DCD (Data Carrier Detect):   ${signals.dataCarrierDetect}`);
-
+        if (debug) {
+            console.log(`RING (Ring Indicator) :      ${signals.ringIndicator}`);
+            console.log(`DSR (Data Set Ready):        ${signals.dataSetReady}`);
+            console.log(`CTS (Clear To Send):         ${signals.clearToSend}`);
+            console.log(`DCD (Data Carrier Detect):   ${signals.dataCarrierDetect}`);
+        }
         let result = {
             RING: signals.ringIndicator,
             DSR: signals.dataSetReady,
