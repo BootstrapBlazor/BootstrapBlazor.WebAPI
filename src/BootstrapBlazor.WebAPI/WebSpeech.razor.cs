@@ -4,7 +4,12 @@ using Microsoft.JSInterop;
 namespace BootstrapBlazor.Components;
 
 /// <summary>
-/// 
+/// 语音识别/合成
+/// <para></para>
+/// 浏览器兼容性提示：安卓基于浏览器API,仅可以工作在Google服务正常的设备上
+/// <para></para>
+/// Recordatorio de compatibilidad del navegador: Android se basa en la API basada en el navegador y solo puede funcionar en el dispositivo normal de Google Service
+/// </remarks>
 /// </summary>
 public partial class WebSpeech : IAsyncDisposable
 {
