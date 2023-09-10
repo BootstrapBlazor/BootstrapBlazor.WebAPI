@@ -1,12 +1,20 @@
 ﻿using Microsoft.AspNetCore.Components;
 using Microsoft.Extensions.Options;
 using Microsoft.JSInterop;
+using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
+using System.Text.Json.Serialization;
 
 namespace BootstrapBlazor.Components;
 
 /// <summary>
 /// 串口读写 WebSerial
+/// <remarks>
+/// <para></para>
+/// 浏览器兼容性：仅限桌面版 Chrome/Edge/Opera
+/// <para></para>
+/// Browser compatibility: Only Desktop Chrome/Edge/Opera
+/// </remarks>
 /// </summary>
 public partial class WebSerial : IAsyncDisposable
 {
@@ -44,6 +52,12 @@ public partial class WebSerial : IAsyncDisposable
     public Func<string?, Task>? OnReceive { get; set; }
 
     /// <summary>
+    /// 获得/设置 收到信号数据回调方法
+    /// </summary>
+    [Parameter]
+    public Func<WebSerialSignals?, Task>? OnSignals { get; set; }
+
+    /// <summary>
     /// 连接按钮文本/Connect button title
     /// </summary>
     [Parameter]
@@ -76,8 +90,37 @@ public partial class WebSerial : IAsyncDisposable
     [Parameter]
     public WebSerialOptions Options { get; set; } = new WebSerialOptions();
 
-    WebSerialOptions? OptionsCache { get; set; } 
-    bool IsConnected { get; set; } 
+    WebSerialOptions? OptionsCache { get; set; }
+
+    /// <summary>
+    /// 串口是否连接
+    /// </summary>
+    bool IsConnected { get; set; }
+
+    /// <summary>
+    /// 收到的信号数据
+    /// </summary>
+    public WebSerialSignals Signals { get; set; } = new WebSerialSignals();
+
+    /// <summary>
+    /// 中断
+    /// </summary>
+    [DisplayName("中断")]
+    public bool Break { get; set; } 
+
+    /// <summary>
+    /// 数据终端就绪
+    /// </summary>
+    [JsonPropertyName("DTR")]
+    [DisplayName("DTR")]
+    public bool DTR { get; set; }
+
+    /// <summary>
+    /// 请求发送
+    /// </summary>
+    [JsonPropertyName("RTS")]
+    [DisplayName("RTS")]
+    public bool RTS { get; set; } 
 
     protected override void OnInitialized()
     {
@@ -203,6 +246,73 @@ public partial class WebSerial : IAsyncDisposable
             if (OnLog != null)
             {
                 await OnLog.Invoke(msg);
+            }
+        }
+        catch (Exception e)
+        {
+            if (OnError != null) await OnError.Invoke(e.Message);
+        }
+    }
+
+    /// <summary>
+    /// 设置Break信号
+    /// </summary>
+    public virtual async Task SetSignalBreak(bool flag) =>await SetSignals(new WebSerialSignalsSetting { Break = flag });
+
+    /// <summary>
+    /// 设置DTR信号
+    /// </summary>
+    public virtual async Task SetSignalDTR(bool flag) =>await SetSignals(new WebSerialSignalsSetting { DTR=flag });
+
+    /// <summary>
+    /// 设置RTS信号
+    /// </summary>
+    public virtual async Task SetSignalRTS(bool flag) => await SetSignals(new WebSerialSignalsSetting { RTS = flag });
+
+    /// <summary>
+    /// 设置信号
+    /// </summary>
+    public virtual async Task SetSignals(WebSerialSignalsSetting signals)
+    {
+        try
+        {
+            await module!.InvokeVoidAsync("setSignals", Instance, signals);
+        }
+        catch
+        {
+        }
+    }
+
+
+    /// <summary>
+    /// 获取信号
+    /// </summary>
+    public virtual async Task GetSignals()
+    {
+        try
+        {
+            Signals=await module!.InvokeAsync<WebSerialSignals>("getSignals", Instance);
+            //add  callback
+        }
+        catch
+        {
+        }
+    }
+
+
+    /// <summary>
+    /// 获取信号回调方法
+    /// </summary>
+    /// <param name="msg"></param>
+    /// <returns></returns>
+    [JSInvokable]
+    public async Task GetSignals(WebSerialSignals signals)
+    {
+        try
+        {
+            if (OnSignals != null)
+            {
+                await OnSignals.Invoke(signals);
             }
         }
         catch (Exception e)
