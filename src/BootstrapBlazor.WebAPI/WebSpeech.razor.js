@@ -12,12 +12,12 @@ export function SpeechRecognitionDemo(wrapper, lang, continuous = false, interim
 
     var colorsEn = ['aqua', 'azure', 'beige', 'bisque', 'black', 'blue', 'brown', 'chocolate', 'coral', 'crimson', 'cyan', 'fuchsia', 'ghostwhite', 'gold', 'goldenrod', 'gray', 'green', 'indigo', 'ivory', 'khaki', 'lavender', 'lime', 'linen', 'magenta', 'maroon', 'moccasin', 'navy', 'olive', 'orange', 'orchid', 'peru', 'pink', 'plum', 'purple', 'red', 'salmon', 'sienna', 'silver', 'snow', 'tan', 'teal', 'thistle', 'tomato', 'turquoise', 'violet', 'white', 'yellow'];
 
-    var SpeechGrammarList = SpeechGrammarList || webkitSpeechGrammarList
+    //var SpeechGrammarList = SpeechGrammarList || webkitSpeechGrammarList
 
     recognition = new SpeechRecognition();
-    const speechRecognitionList = new SpeechGrammarList();
-    speechRecognitionList.addFromString(colors, 1);
-    recognition.grammars = speechRecognitionList;
+    //const speechRecognitionList = new SpeechGrammarList();
+    //speechRecognitionList.addFromString(colors, 1);
+    //recognition.grammars = speechRecognitionList;
     recognition.continuous = continuous;
     recognition.lang = lang;
     recognition.interimResults = interimResults;
