@@ -108,6 +108,9 @@ v7.3.6
 v7.4.0
 - WebSpeech 语音识别优化
 
+v7.4.2
+- WebSerial 添加信号数据处理
+
 ---
 #### Blazor 组件
 
