@@ -129,10 +129,10 @@ public class WebSerialOptions
     public string? GetSignalsBtnTitle { get; set; } = "获取信号";
 
     /// <summary>
-    /// 收到数据后触发检查状态
+    /// 自动检查状态
     /// </summary>
-    [DisplayName("收到数据后触发检查状态")]
-    public bool AfterReceiveDataGetSignals { get; set; } 
+    [DisplayName("自动检查状态")]
+    public bool AutoGetSignals { get; set; } 
 
 }
 

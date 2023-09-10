@@ -6,7 +6,7 @@
     </PropertyGroup>
 
     <PropertyGroup>
-        <Version>7.4.2</Version>
+        <Version>7.4.3</Version>
         <PackageProjectUrl>https://github.com/densen2014/BootstrapBlazor.WebAPI</PackageProjectUrl>
         <RepositoryUrl>https://github.com/densen2014/BootstrapBlazor.WebAPI</RepositoryUrl>
         <RepositoryType>git</RepositoryType>

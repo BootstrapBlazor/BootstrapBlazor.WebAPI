@@ -78,7 +78,7 @@ export async function Init(instance, element, options, command) {
                 port = null;
                 console.error(error);
                 console.log("重新选择端口");
-                return await connect(); 
+                return await connect();
             }
 
             if (!options.outputInHex) {
@@ -163,7 +163,12 @@ export async function Init(instance, element, options, command) {
 
     async function readLoop() {
         while (true) {
-            if (options.afterReceiveDataGetSignals) await getSignals(instance);
+            if (options.autoGetSignals) {
+                setInterval(async () => {
+                    console.log("[getSignals]");
+                    await getSignals(instance);
+                }, 300);
+            }
             let result;
             if (options.autoFrameBreak == "Timeout") {
                 let timeout = 500;
