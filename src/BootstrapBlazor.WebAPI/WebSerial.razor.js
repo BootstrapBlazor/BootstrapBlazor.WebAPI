@@ -10,17 +10,15 @@ export async function Init(instance, element, options, command) {
     const butConnect = element.querySelector("[data-action=butConnect]");
     const butwrite = element.querySelector("[data-action=butwrite]");
     const fname = element.querySelector("[data-action=fname]");
-    const notSupported = element.querySelector('[data-action=notSupported]');
+    const notSupported = element.querySelector("[data-action=notSupported]");
 
-    fname.style.visibility = "visible";
-    butwrite.style.visibility = "visible";
     butConnect.addEventListener("click", clickConnect);
     butwrite.addEventListener("click", write);
 
-    if (notSupported) notSupported.classList.toggle('hidden', 'serial' in navigator);
+    if (notSupported) notSupported.classList.toggle("hidden", "serial" in navigator);
 
     if (!"serial" in navigator) {
-        instance.invokeMethodAsync('GetError', "The Web Serial API is not supported");
+        instance.invokeMethodAsync("GetError", "The Web Serial API is not supported");
         return;
     }
 
@@ -33,44 +31,55 @@ export async function Init(instance, element, options, command) {
         if (ports.length > 0) {
             if (options.autoConnect) {
                 port = ports[0];
-                console.log('自动连接设备', port);
-                instance.invokeMethodAsync('GetLog', '自动连接设备');
+                console.log("自动连接设备", port);
+                instance.invokeMethodAsync("GetLog", "自动连接设备");
             }
-            instance.invokeMethodAsync('GetLog', `获取到授权设备: ${ports.length}`);
+            instance.invokeMethodAsync("GetLog", `获取到授权设备: ${ports.length}`);
         }
     }
 
     async function open() {
-        console.log('open')
+        console.log("open")
         if (!port.readable) {
-            console.log('尝试连接');
+            console.log("尝试连接");
             // Wait for the serial port to open.
             if (!options) options = { baudRate: 9600 };
             await port.open(options);
-            if (log) log.textContent += '已连接' + '\n';
-            console.log('已连接', port);
-            instance.invokeMethodAsync('GetLog', `已连接:${options.baudRate}`);
+            if (log) log.textContent += "已连接" + "\n";
+            console.log("已连接", port);
+            instance.invokeMethodAsync("GetLog", `已连接:${options.baudRate}`);
         }
     }
 
     async function connect() {
         try {
             if (!port) {
-                const filters = [
-                    { usbVendorId: 0x2A03, usbProductId: 0x0043 },
-                    { usbVendorId: 0x2341, usbProductId: 0x0001 }
-                ];
+                //const filters = [
+                //    { usbVendorId: 0x2A03, usbProductId: 0x0043 },
+                //    { usbVendorId: 0x2341, usbProductId: 0x0001 }
+                //];
                 // - 请求端口并打开连接.
                 //port = await navigator.serial.requestPort({ filters });
-                port = await navigator.serial.requestPort();
+                try {
+                    port = await navigator.serial.requestPort();
+                } catch (error) {
+                    port = null;
+                    console.error(error);
+                    instance.invokeMethodAsync("GetError", error.message);
+                    return false;
+                }
                 const { usbProductId, usbVendorId } = port.getInfo();
                 console.log(usbProductId, usbVendorId);
-                instance.invokeMethodAsync('GetLog', usbProductId);
+                instance.invokeMethodAsync("GetLog", usbProductId);
             }
-
-            await open();
-
-            await setSignals();
+            try {
+                await open();
+            } catch (error) {
+                port = null;
+                console.error(error);
+                console.log("重新选择端口");
+                return await connect(); 
+            }
 
             if (!options.outputInHex) {
                 let decoder = new TextDecoderStream();
@@ -90,33 +99,18 @@ export async function Init(instance, element, options, command) {
             const encoder = new TextEncoderStream();
             outputDone = encoder.readable.pipeTo(port.writable);
             outputStream = encoder.writable;
-            instance.invokeMethodAsync('Connect', true);
+            fname.style.visibility = "visible";
+            butwrite.style.visibility = "visible";
+            instance.invokeMethodAsync("Connect", true);
             return true;
         } catch (error) {
+            port = null;
             console.error(error);
-            instance.invokeMethodAsync('GetError', error.message);
+            instance.invokeMethodAsync("GetError", error.message);
         }
         return false;
     }
 
-    async function setSignals() {
-
-        // 中断
-        await port.setSignals({ break: options.break });
-
-        // 数据终端就绪 (DTR) 
-        await port.setSignals({ dataTerminalReady: options.DTR });
-
-        // 请求发送 (RTS) 
-        await port.setSignals({ requestToSend: options.RTS });
-
-        const signals = await port.getSignals();
-
-        console.log(`Clear To Send:       ${signals.clearToSend}`);
-        console.log(`Data Carrier Detect: ${signals.dataCarrierDetect}`);
-        console.log(`Data Set Ready:      ${signals.dataSetReady}`);
-        console.log(`Ring Indicator:      ${signals.ringIndicator}`);
-    }
 
     async function disconnect() {
         try {
@@ -134,24 +128,24 @@ export async function Init(instance, element, options, command) {
             }
             await port.close();
             port = null;
-            instance.invokeMethodAsync('Connect', false);
+            instance.invokeMethodAsync("Connect", false);
             return true;
         } catch (error) {
             console.error(error);
-            instance.invokeMethodAsync('GetError', error.message);
+            instance.invokeMethodAsync("GetError", error.message);
         }
         return false;
     }
 
     function addEventListener() {
         navigator.serial.addEventListener("connect", (event) => {
-            instance.invokeMethodAsync('GetLog', "connect");
-            instance.invokeMethodAsync('Connect', true);
+            instance.invokeMethodAsync("GetLog", "connect");
+            instance.invokeMethodAsync("Connect", true);
         });
 
         navigator.serial.addEventListener("disconnect", (event) => {
-            instance.invokeMethodAsync('GetLog', "disconnect");
-            instance.invokeMethodAsync('Connect', false);
+            instance.invokeMethodAsync("GetLog", "disconnect");
+            instance.invokeMethodAsync("Connect", false);
         });
     }
 
@@ -169,12 +163,13 @@ export async function Init(instance, element, options, command) {
 
     async function readLoop() {
         while (true) {
+            if (options.afterReceiveDataGetSignals) await getSignals(instance);
             let result;
             if (options.autoFrameBreak == "Timeout") {
                 let timeout = 500;
                 const timer = setTimeout(() => {
                     //reader.releaseLock();
-                    console.log('[Timeout]');
+                    console.log("[Timeout]");
                 }, timeout);
                 result = await reader.read();
                 clearTimeout(timer);
@@ -184,12 +179,12 @@ export async function Init(instance, element, options, command) {
             }
             const { value, done } = result;
             if (value) {
-                if (log) log.textContent += '收到数据: ' + value + '\n';
-                instance.invokeMethodAsync('ReceiveData', value + "");
+                if (log) log.textContent += "收到数据: " + value + "\n";
+                instance.invokeMethodAsync("ReceiveData", value + "");
             }
             if (done) {
-                console.log('[readLoop] DONE', done);
-                instance.invokeMethodAsync('GetLog', `接收数据完成: ${done}`);
+                console.log("[readLoop] DONE", done);
+                instance.invokeMethodAsync("GetLog", `接收数据完成: ${done}`);
                 reader.releaseLock();
                 break;
             }
@@ -214,9 +209,9 @@ export async function Init(instance, element, options, command) {
         }
 
         lines.forEach(async (line) => {
-            if (log) log.textContent += '发送数据' + line + '\n';
-            console.log('[SEND]', line);
-            instance.invokeMethodAsync('GetLog', `发送数据: ${line}`);
+            if (log) log.textContent += "发送数据" + line + "\n";
+            console.log("[SEND]", line);
+            instance.invokeMethodAsync("GetLog", `发送数据: ${line}`);
             await writer.write(line);
         });
         writer.releaseLock();
@@ -233,7 +228,7 @@ export async function Init(instance, element, options, command) {
         }
 
         transform(chunk, controller) {
-            console.log('[GET]', chunk);
+            console.log("[GET]", chunk);
             // 将新块附加到现有块。
             this.chunks += chunk + "";
             // 对于块中的每个换行符，将解析后的行发送出去。
@@ -266,40 +261,73 @@ export async function forget(instance) {
         }
     } catch (error) {
         console.error(error);
-        instance.invokeMethodAsync('GetError', error.message);
+        instance.invokeMethodAsync("GetError", error.message);
     }
 }
 
 
-export async function setSignalsDTR(instance) {
+export async function setSignals(instance, options) {
     try {
         if ("serial" in navigator && "forget" in SerialPort.prototype) {
             if (port) {
 
-                await port.setSignals({ dataTerminalReady: false });
+                // 中断
+                if (options.break != null) await port.setSignals({ break: options.break });
 
-                const signals = await port.getSignals();
+                // 数据终端就绪 (DTR) 
+                if (options.DTR != null) await port.setSignals({ dataTerminalReady: options.DTR });
 
-                console.log(`Clear To Send:       ${signals.clearToSend}`);
-                console.log(`Data Carrier Detect: ${signals.dataCarrierDetect}`);
-                console.log(`Data Set Ready:      ${signals.dataSetReady}`);
-                console.log(`Ring Indicator:      ${signals.ringIndicator}`);
-
-                await new Promise(resolve => setTimeout(resolve, 200));
-                await port.setSignals({ dataTerminalReady: true });
-
-                signals = await port.getSignals();
-
-                console.log(`Clear To Send:       ${signals.clearToSend}`);
-                console.log(`Data Carrier Detect: ${signals.dataCarrierDetect}`);
-                console.log(`Data Set Ready:      ${signals.dataSetReady}`);
-                console.log(`Ring Indicator:      ${signals.ringIndicator}`);
+                // 请求发送 (RTS) 
+                if (options.RTS != null) await port.setSignals({ requestToSend: options.RTS });
 
             }
         }
     } catch (error) {
         console.error(error);
-        instance.invokeMethodAsync('GetError', error.message);
+        instance.invokeMethodAsync("GetError", error.message);
+    }
+
+}
+
+export async function setDTR_Demo() {
+    let signals = await port.getSignals();
+
+    console.log(`Clear To Send:       ${signals.clearToSend}`);
+    console.log(`Data Carrier Detect: ${signals.dataCarrierDetect}`);
+    console.log(`Data Set Ready:      ${signals.dataSetReady}`);
+    console.log(`Ring Indicator:      ${signals.ringIndicator}`);
+
+    await new Promise(resolve => setTimeout(resolve, 200));
+    await port.setSignals({ dataTerminalReady: true });
+
+    signals = await port.getSignals();
+
+    console.log(`Clear To Send:       ${signals.clearToSend}`);
+    console.log(`Data Carrier Detect: ${signals.dataCarrierDetect}`);
+    console.log(`Data Set Ready:      ${signals.dataSetReady}`);
+    console.log(`Ring Indicator:      ${signals.ringIndicator}`);
+}
+
+export async function getSignals(instance) {
+    try {
+        let signals = await port.getSignals();
+
+        console.log(`RING (Ring Indicator) :      ${signals.ringIndicator}`);
+        console.log(`DSR (Data Set Ready):        ${signals.dataSetReady}`);
+        console.log(`CTS (Clear To Send):         ${signals.clearToSend}`);
+        console.log(`DCD (Data Carrier Detect):   ${signals.dataCarrierDetect}`);
+
+        let result = {
+            RING: signals.ringIndicator,
+            DSR: signals.dataSetReady,
+            CTS: signals.clearToSend,
+            DCD: signals.dataCarrierDetect
+        };
+        instance.invokeMethodAsync("GetSignals", result);
+        return result;
+    } catch (error) {
+        console.error(error);
+        instance.invokeMethodAsync("GetError", error.message);
     }
 
 }

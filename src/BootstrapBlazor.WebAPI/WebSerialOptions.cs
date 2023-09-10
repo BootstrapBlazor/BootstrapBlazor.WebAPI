@@ -99,26 +99,6 @@ public class WebSerialOptions
     public string? FrameBreakChar { get; set; }
 
     /// <summary>
-    /// 中断 (未完成)
-    /// </summary>
-    [DisplayName("中断(未完成)")] 
-    public bool Break { get; set; }
-
-    /// <summary>
-    /// 数据终端就绪 (未完成)
-    /// </summary>
-    [JsonPropertyName("DTR")]
-    [DisplayName("DTR(未完成)")]
-    public bool DTR { get; set; }
-
-    /// <summary>
-    /// 请求发送 (未完成)
-    /// </summary>
-    [JsonPropertyName("RTS")]
-    [DisplayName("RTS(未完成)")]
-    public bool RTS { get; set; } 
-
-    /// <summary>
     /// 连接按钮文本/Connect button title
     /// </summary>
     [DisplayName("连接按钮文本")]
@@ -135,6 +115,24 @@ public class WebSerialOptions
     /// </summary>
     [DisplayName("写入按钮文本")]
     public string? WriteBtnTitle { get; set; } = "写入";
+
+    /// <summary>
+    /// 设置信号文本/SetSignals button title
+    /// </summary>
+    [DisplayName("设置信号文本")]
+    public string? SetSignalsBtnTitle { get; set; } = "设置信号";
+
+    /// <summary>
+    /// 获取信号按钮文本/Connect button title
+    /// </summary>
+    [DisplayName("获取信号按钮文本")]
+    public string? GetSignalsBtnTitle { get; set; } = "获取信号";
+
+    /// <summary>
+    /// 收到数据后触发检查状态
+    /// </summary>
+    [DisplayName("收到数据后触发检查状态")]
+    public bool AfterReceiveDataGetSignals { get; set; } 
 
 }
 
@@ -209,4 +207,54 @@ public enum AutoFrameBreakType
     /// </summary>
     [Description("字符间隔(未实现)")]
     CharacterInterval,
+}
+
+public class WebSerialSignalsSetting
+{
+    /// <summary>
+    /// 中断
+    /// </summary>
+    [DisplayName("中断")]
+    public bool? Break { get; set; }
+
+    /// <summary>
+    /// 数据终端就绪
+    /// </summary>
+    [JsonPropertyName("DTR")]
+    [DisplayName("DTR")]
+    public bool? DTR { get; set; }
+
+    /// <summary>
+    /// 请求发送
+    /// </summary>
+    [JsonPropertyName("RTS")]
+    [DisplayName("RTS")]
+    public bool? RTS { get; set; }
+
+}
+
+public class WebSerialSignals
+{
+    /// <summary>
+    /// Ring Indicator
+    /// </summary>
+    public bool RING { get; set; }
+
+    /// <summary>
+    /// Data Set Ready
+    /// </summary>
+    public bool DSR { get; set; }
+
+
+    /// <summary>
+    /// Clear To Send
+    /// </summary>
+    public bool CTS { get; set; }
+
+
+    /// <summary>
+    /// Data Carrier Detect
+    /// </summary>
+    public bool DCD { get; set; }
+
 }
