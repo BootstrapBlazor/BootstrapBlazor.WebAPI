@@ -188,7 +188,11 @@ export function SpeechSynthesis(wrapper, text, lang, rate = 1, picth = 1, volume
         else
             utterance.voice = voices.find(voice => voice.lang === lang);
 
-        wrapper.invokeMethodAsync('GetStatus', '语音:' + utterance.voice.name);
+        try {
+            wrapper.invokeMethodAsync('GetStatus', '语音:' + utterance.voice.name);
+        } catch (error) {
+            console.error(error);
+        }
 
         utterance.text = text;
         utterance.volume = volume;
@@ -212,6 +216,16 @@ export function SpeechSynthesis(wrapper, text, lang, rate = 1, picth = 1, volume
     } catch (error) {
         console.error(error);
         wrapper.invokeMethodAsync('GetError', error.message);
+    }
+}
+
+export function Speaking(wrapper) {
+    try {
+        return speechSynthesis.speaking;
+    } catch (error) {
+        console.error(error);
+        wrapper.invokeMethodAsync('GetError', error.message);
+        return false;
     }
 }
 

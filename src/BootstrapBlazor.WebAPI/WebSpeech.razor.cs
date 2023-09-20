@@ -211,6 +211,19 @@ public partial class WebSpeech : IAsyncDisposable
         }
     }
 
+    public virtual async Task<bool> Speaking()
+    {
+        try
+        {
+            return await module!.InvokeAsync<bool>("Speaking", Instance);
+        }
+        catch (Exception e)
+        {
+            if (OnError != null) await OnError.Invoke(e.Message);
+        }
+        return false;
+    }
+
     /// <summary>
     /// 状态
     /// </summary>
