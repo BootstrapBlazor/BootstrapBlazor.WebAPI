@@ -108,7 +108,7 @@ public partial class WebSpeech : IAsyncDisposable
     /// 语音识别
     /// </summary>
     /// <returns></returns>
-    public virtual async Task<string> SpeechRecognition(string lang = "zh-CN", SpeechRecognitionOption? option = null)
+    public virtual async Task<string> SpeechRecognition(string? lang = "zh-CN", SpeechRecognitionOption? option = null)
     {
         option = option ?? new SpeechRecognitionOption();
         return await SpeechRecognition(lang, option.Continuous, option.InterimResults, option.MaxAlternatives);
@@ -122,11 +122,11 @@ public partial class WebSpeech : IAsyncDisposable
     /// <param name="interimResults">返回临时结果。默认为 false</param>
     /// <param name="maxAlternatives">返回结果数量。默认值为 1</param>
     /// <returns></returns>
-    public virtual async Task<string> SpeechRecognition(string lang = "zh-CN", bool continuous = false, bool interimResults = false, int maxAlternatives = 1)
+    public virtual async Task<string> SpeechRecognition(string? lang = "zh-CN", bool continuous = false, bool interimResults = false, int maxAlternatives = 1)
     {
         try
         {
-            return await module!.InvokeAsync<string>("SpeechRecognition", Instance, lang, continuous, interimResults, maxAlternatives);
+            return await module!.InvokeAsync<string>("SpeechRecognition", Instance, lang ?? "zh-CN", continuous, interimResults, maxAlternatives);
         }
         catch (Exception e)
         {
@@ -139,12 +139,12 @@ public partial class WebSpeech : IAsyncDisposable
     /// 语音识别Demo
     /// </summary>
     /// <returns></returns>
-    public virtual async Task<string> SpeechRecognitionDemo(string lang = "zh-CN", SpeechRecognitionOption? option = null)
+    public virtual async Task<string> SpeechRecognitionDemo(string? lang = "zh-CN", SpeechRecognitionOption? option = null)
     {
         try
         {
             option = option ?? new SpeechRecognitionOption();
-            return await module!.InvokeAsync<string>("SpeechRecognitionDemo", Instance, lang, option.Continuous,option.InterimResults);
+            return await module!.InvokeAsync<string>("SpeechRecognitionDemo", Instance, lang?? "zh-CN", option.Continuous,option.InterimResults);
         }
         catch (Exception e)
         {
@@ -159,10 +159,10 @@ public partial class WebSpeech : IAsyncDisposable
     /// <param name="text">文字</param>
     /// <param name="lang">语言</param>
     /// <returns></returns>
-    public virtual async Task SpeechSynthesis(string text, SpeechSynthesisOption? option, string lang = "zh-CN", string? voiceURI = null)
+    public virtual async Task SpeechSynthesis(string text, SpeechSynthesisOption? option, string? lang = "zh-CN", string? voiceURI = null)
     {
         option = option ?? new SpeechSynthesisOption();
-        await SpeechSynthesis(text, lang, option.Rate, option.Picth, option.Volume, voiceURI);
+        await SpeechSynthesis(text, lang?? "zh-CN", option.Rate, option.Picth, option.Volume, voiceURI);
     }
 
     /// <summary>
@@ -175,11 +175,11 @@ public partial class WebSpeech : IAsyncDisposable
     /// <param name="volume">音量, 浮点数，介于 0（最低）和 1（最高）之间</param>
     /// <param name="voiceURI">语音引擎名称</param>
     /// <returns></returns>
-    public virtual async Task SpeechSynthesis(string text, string lang = "zh-CN", double rate = 1, double picth = 1, double volume = 1, string? voiceURI = null)
+    public virtual async Task SpeechSynthesis(string text, string? lang = "zh-CN", double rate = 1, double picth = 1, double volume = 1, string? voiceURI = null)
     {
         try
         {
-            await module!.InvokeVoidAsync("SpeechSynthesis", Instance, text, lang, rate, picth, volume, voiceURI);
+            await module!.InvokeVoidAsync("SpeechSynthesis", Instance, text, lang ?? "zh-CN", rate, picth, volume, voiceURI);
         }
         catch (Exception e)
         {

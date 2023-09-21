@@ -6,6 +6,7 @@
 
 
 using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
 
 namespace BootstrapBlazor.Components;
@@ -101,5 +102,33 @@ public class WebVoice
     [DisplayName("本地服务")]
     public bool LocalService { get; set; }
 
+
+}
+
+public enum EnumWebVoiceLanguage
+{
+    /// <summary>
+    ///普通话
+    /// </summary>
+    [Display(Name = "普通话")]
+    zh_CN,
+
+    /// <summary>
+    ///粤语
+    /// </summary>
+    [Display(Name = "粤语")]
+    zh_HK,
+
+    /// <summary>
+    ///英文
+    /// </summary>
+    [Display(Name = "英文")]
+    en_US,
+
+    /// <summary>
+    ///西文
+    /// </summary>
+    [Display(Name = "西文")]
+    es_ES,
 
 }
