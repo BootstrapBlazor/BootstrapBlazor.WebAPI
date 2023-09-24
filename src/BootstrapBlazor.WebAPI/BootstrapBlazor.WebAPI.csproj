@@ -6,7 +6,7 @@
     </PropertyGroup>
 
     <PropertyGroup>
-        <Version>7.4.6</Version>
+        <Version>7.5.0</Version>
         <PackageProjectUrl>https://github.com/densen2014/BootstrapBlazor.WebAPI</PackageProjectUrl>
         <RepositoryUrl>https://github.com/densen2014/BootstrapBlazor.WebAPI</RepositoryUrl>
         <RepositoryType>git</RepositoryType>
@@ -24,7 +24,7 @@
     </ItemGroup>
     
     <ItemGroup Condition="'$(TargetFramework)' == 'net7.0'">
-        <PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="7.*" />
+        <PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="7.0" />
     </ItemGroup>
     
     <ItemGroup>
