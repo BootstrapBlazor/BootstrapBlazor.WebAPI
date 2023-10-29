@@ -1,13 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO.Ports;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿// ********************************** 
+// Densen Informatica 中讯科技 
+// 作者：Alex Chow
+// e-mail:zhouchuanglin@gmail.com 
+// **********************************
 
 namespace BootstrapBlazor.Components;
 
-static class Utils
+internal static class Utils
 {
 
     public static string convertToHexString(string str)
@@ -41,7 +40,7 @@ static class Utils
         for (int i = 0; i < hexString.ToCharArray().Length; i++)
         {
             char s = hexString[i];
-            if ((s >= '0' && s <= '9') || (s >= 'A' && s <= 'F'))
+            if (s is >= '0' and <= '9' or >= 'A' and <= 'F')
             {
                 hexString = hexString.Substring(i);
                 break;

@@ -1,8 +1,12 @@
-﻿using Microsoft.AspNetCore.Components;
-using Microsoft.Extensions.Options;
+﻿// ********************************** 
+// Densen Informatica 中讯科技 
+// 作者：Alex Chow
+// e-mail:zhouchuanglin@gmail.com 
+// **********************************
+
+using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 using System.ComponentModel;
-using System.Diagnostics.CodeAnalysis;
 using System.Text.Json.Serialization;
 
 namespace BootstrapBlazor.Components;
@@ -18,7 +22,7 @@ namespace BootstrapBlazor.Components;
 /// </summary>
 public partial class WebSerial : IAsyncDisposable
 {
-    [Inject] IJSRuntime? JS { get; set; }
+    [Inject] private IJSRuntime? JS { get; set; }
     private IJSObjectReference? module;
     private DotNetObjectReference<WebSerial>? Instance { get; set; }
 
@@ -90,12 +94,12 @@ public partial class WebSerial : IAsyncDisposable
     [Parameter]
     public WebSerialOptions Options { get; set; } = new WebSerialOptions();
 
-    WebSerialOptions? OptionsCache { get; set; }
+    private WebSerialOptions? OptionsCache { get; set; }
 
     /// <summary>
     /// 串口是否连接
     /// </summary>
-    bool IsConnected { get; set; }
+    private bool IsConnected { get; set; }
 
     /// <summary>
     /// 收到的信号数据
@@ -106,7 +110,7 @@ public partial class WebSerial : IAsyncDisposable
     /// 中断
     /// </summary>
     [DisplayName("中断")]
-    public bool Break { get; set; } 
+    public bool Break { get; set; }
 
     /// <summary>
     /// 数据终端就绪
@@ -120,7 +124,7 @@ public partial class WebSerial : IAsyncDisposable
     /// </summary>
     [JsonPropertyName("RTS")]
     [DisplayName("RTS")]
-    public bool RTS { get; set; } 
+    public bool RTS { get; set; }
 
     protected override void OnInitialized()
     {
@@ -142,10 +146,10 @@ public partial class WebSerial : IAsyncDisposable
                 module = await JS!.InvokeAsync<IJSObjectReference>("import", "./_content/BootstrapBlazor.WebAPI/WebSerial.razor.js" + "?v=" + System.Reflection.Assembly.GetExecutingAssembly().GetName().Version);
                 Instance = DotNetObjectReference.Create(this);
                 await module!.InvokeVoidAsync("Init", Instance, Element, Options, "Start");
-                OptionsCache=Options;
+                OptionsCache = Options;
             }
 
-            if (!firstRender && module!=null && OptionsCache != Options)
+            if (!firstRender && module != null && OptionsCache != Options)
             {
                 await module!.InvokeVoidAsync("Init", Instance, Element, Options, "Start");
                 OptionsCache = Options;
@@ -181,7 +185,7 @@ public partial class WebSerial : IAsyncDisposable
         {
             await module!.InvokeVoidAsync("Init", Instance, Element, Options, "Start");
         }
-        catch 
+        catch
         {
         }
     }
@@ -195,7 +199,7 @@ public partial class WebSerial : IAsyncDisposable
         {
             await module!.InvokeVoidAsync("forget", Instance);
         }
-        catch 
+        catch
         {
         }
     }
@@ -257,12 +261,12 @@ public partial class WebSerial : IAsyncDisposable
     /// <summary>
     /// 设置Break信号
     /// </summary>
-    public virtual async Task SetSignalBreak(bool flag) =>await SetSignals(new WebSerialSignalsSetting { Break = flag });
+    public virtual async Task SetSignalBreak(bool flag) => await SetSignals(new WebSerialSignalsSetting { Break = flag });
 
     /// <summary>
     /// 设置DTR信号
     /// </summary>
-    public virtual async Task SetSignalDTR(bool flag) =>await SetSignals(new WebSerialSignalsSetting { DTR=flag });
+    public virtual async Task SetSignalDTR(bool flag) => await SetSignals(new WebSerialSignalsSetting { DTR = flag });
 
     /// <summary>
     /// 设置RTS信号
@@ -291,7 +295,7 @@ public partial class WebSerial : IAsyncDisposable
     {
         try
         {
-            Signals=await module!.InvokeAsync<WebSerialSignals>("getSignals", Instance);
+            Signals = await module!.InvokeAsync<WebSerialSignals>("getSignals", Instance);
             //add  callback
         }
         catch
