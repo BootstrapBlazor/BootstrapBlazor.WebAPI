@@ -5,7 +5,6 @@
 // **********************************
 
 
-using System;
 using System.ComponentModel;
 
 namespace BootstrapBlazor.Components;
@@ -42,6 +41,6 @@ public enum Screen
     /// </summary>
     /// <returns></returns>
     [Description("返回屏幕当前的方向")]
-    GetOrientation, 
+    GetOrientation,
 
 }

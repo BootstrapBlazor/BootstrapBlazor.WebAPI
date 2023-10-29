@@ -1,4 +1,10 @@
-﻿using Microsoft.JSInterop;
+﻿// ********************************** 
+// Densen Informatica 中讯科技 
+// 作者：Alex Chow
+// e-mail:zhouchuanglin@gmail.com 
+// **********************************
+
+using Microsoft.JSInterop;
 
 namespace BootstrapBlazor.WebAPI.Services;
 
@@ -11,8 +17,8 @@ public interface ICookie
 
 public class CookieService : ICookie
 {
-    readonly IJSRuntime JSRuntime;
-    string expires = "";
+    private readonly IJSRuntime JSRuntime;
+    private string expires = "";
 
     public CookieService(IJSRuntime jsRuntime)
     {

@@ -1,4 +1,10 @@
-﻿using System.Security.Cryptography;
+﻿// ********************************** 
+// Densen Informatica 中讯科技 
+// 作者：Alex Chow
+// e-mail:zhouchuanglin@gmail.com 
+// **********************************
+
+using System.Security.Cryptography;
 using System.Text;
 
 namespace BootstrapBlazor.WebAPI.Services;
@@ -6,9 +12,9 @@ namespace BootstrapBlazor.WebAPI.Services;
 
 public class PasswordHasher
 {
-    public string HashPassword(string password,string? sal= null)
+    public string HashPassword(string password, string? sal = null)
     {
-        var rnd = sal??Guid.NewGuid().ToString("N").Substring(10);
+        var rnd = sal ?? Guid.NewGuid().ToString("N").Substring(10);
         return BuildHash(rnd, password);
     }
 

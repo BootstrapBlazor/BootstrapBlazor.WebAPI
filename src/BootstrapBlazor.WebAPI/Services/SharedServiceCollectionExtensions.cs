@@ -21,7 +21,7 @@ public static class StorageServiceCollectionExtensions
     /// <returns></returns>
     public static IServiceCollection AddStorages(this IServiceCollection services)
     {
-        
+
         services.AddScoped<ICookie, CookieService>();
         services.AddScoped<IStorage, StorageService>();
 

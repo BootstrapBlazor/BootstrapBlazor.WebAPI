@@ -31,14 +31,14 @@ public partial class UploadToBase64
     /// 只接受图片上传, 默认为 true
     /// </summary>
     [Parameter]
-    public bool  ImageOnly  { get; set; } = true;
+    public bool ImageOnly { get; set; } = true;
 
     /// <summary>
     /// 在移动设备上可使用相机拍照, 默认为 false
     /// <see href="https://developer.mozilla.org/en-US/docs/Web/HTML/Attributes/capture"/>
     /// </summary>
     [Parameter]
-    public bool Capture { get; set; } 
+    public bool Capture { get; set; }
 
     /// <summary>
     /// 在移动设备上使用前置相机拍照, 默认为 false
@@ -67,7 +67,7 @@ public partial class UploadToBase64
     /// 获得/设置 用户自定义样式
     /// </summary>
     [Parameter]
-    public string? Style { get; set; } 
+    public string? Style { get; set; }
 
     /// <summary>
     /// 获得/设置 上传回调方法,返回 ImageFile 集合
@@ -107,12 +107,12 @@ public partial class UploadToBase64
         if (OnChanged != null) await OnChanged.Invoke(dataUrlList);
     }
 
-    private async Task<string> PopulateImageFromStream(Stream stream,string contentType)
+    private async Task<string> PopulateImageFromStream(Stream stream, string contentType)
     {
         var ms = await CopyStream(stream);
         byte[] byteArray = ms.ToArray();
         var b64String = Convert.ToBase64String(byteArray);
-        return $"data:{(contentType??"image/jpeg")};base64," + b64String;
+        return $"data:{(contentType ?? "image/jpeg")};base64," + b64String;
     }
 
     /// <summary>
@@ -120,7 +120,7 @@ public partial class UploadToBase64
     /// </summary>
     /// <param name="input"></param>
     /// <returns></returns>
-    static async Task<MemoryStream> CopyStream(Stream input)
+    private static async Task<MemoryStream> CopyStream(Stream input)
     {
         try
         {

@@ -1,4 +1,10 @@
-﻿using Microsoft.AspNetCore.Components;
+﻿// ********************************** 
+// Densen Informatica 中讯科技 
+// 作者：Alex Chow
+// e-mail:zhouchuanglin@gmail.com 
+// **********************************
+
+using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 
 namespace BootstrapBlazor.Components;
@@ -13,7 +19,7 @@ namespace BootstrapBlazor.Components;
 /// </summary>
 public partial class WebSpeech : IAsyncDisposable
 {
-    [Inject] IJSRuntime? JS { get; set; }
+    [Inject] private IJSRuntime? JS { get; set; }
     private IJSObjectReference? module;
     private DotNetObjectReference<WebSpeech>? Instance { get; set; }
 
@@ -144,7 +150,7 @@ public partial class WebSpeech : IAsyncDisposable
         try
         {
             option = option ?? new SpeechRecognitionOption();
-            return await module!.InvokeAsync<string>("SpeechRecognitionDemo", Instance, lang?? "zh-CN", option.Continuous,option.InterimResults);
+            return await module!.InvokeAsync<string>("SpeechRecognitionDemo", Instance, lang ?? "zh-CN", option.Continuous, option.InterimResults);
         }
         catch (Exception e)
         {
@@ -162,7 +168,7 @@ public partial class WebSpeech : IAsyncDisposable
     public virtual async Task SpeechSynthesis(string text, SpeechSynthesisOption? option, string? lang = "zh-CN", string? voiceURI = null)
     {
         option = option ?? new SpeechSynthesisOption();
-        await SpeechSynthesis(text, lang?? "zh-CN", option.Rate, option.Picth, option.Volume, voiceURI);
+        await SpeechSynthesis(text, lang ?? "zh-CN", option.Rate, option.Picth, option.Volume, voiceURI);
     }
 
     /// <summary>

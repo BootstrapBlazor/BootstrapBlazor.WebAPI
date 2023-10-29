@@ -5,7 +5,6 @@
 // **********************************
 
 
-using Microsoft.AspNetCore.Components;
 using System.ComponentModel;
 
 namespace BootstrapBlazor.Components;
@@ -46,13 +45,13 @@ public class CaptureOptions
     /// 图像宽度
     /// </summary>
     [DisplayName("图像宽度")]
-    public int? Width { get; set; }  
+    public int? Width { get; set; }
 
     /// <summary>
     /// 图像高度
     /// </summary>
     [DisplayName("图像高度")]
-    public int? Height { get; set; }  
+    public int? Height { get; set; }
 
 
 }

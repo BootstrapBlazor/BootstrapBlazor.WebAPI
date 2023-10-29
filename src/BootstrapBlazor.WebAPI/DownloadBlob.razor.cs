@@ -14,7 +14,7 @@ namespace BootstrapBlazor.Components;
 /// </summary>
 public partial class DownloadBlob : IAsyncDisposable
 {
-    [Inject] IJSRuntime? JS { get; set; }
+    [Inject] private IJSRuntime? JS { get; set; }
     private IJSObjectReference? module;
 
     private DotNetObjectReference<DownloadBlob>? Instance { get; set; }
@@ -34,7 +34,7 @@ public partial class DownloadBlob : IAsyncDisposable
             {
                 module = await JS!.InvokeAsync<IJSObjectReference>("import", "./_content/BootstrapBlazor.WebAPI/download.js" + "?v=" + System.Reflection.Assembly.GetExecutingAssembly().GetName().Version);
                 Instance = DotNetObjectReference.Create(this);
-             }
+            }
         }
         catch (Exception e)
         {
@@ -48,16 +48,16 @@ public partial class DownloadBlob : IAsyncDisposable
     /// <param name="fileName">文件名或者文件路径 | File name or the file path</param>
     /// <param name="memoryStream">数据流,为空则读取 <paramref name="fileName"/>, 默认为 null | data stream, if is null, read <paramref name="fileName"/>, default is null</param>
     /// <returns></returns>
-    public virtual async Task<string> DownloadFileFromStream(string fileName, MemoryStream? memoryStream=null, bool isAndroid=false)
+    public virtual async Task<string> DownloadFileFromStream(string fileName, MemoryStream? memoryStream = null, bool isAndroid = false)
     {
         try
         {
-            if (string.IsNullOrWhiteSpace (fileName))
+            if (string.IsNullOrWhiteSpace(fileName))
             {
                 return "File name cannot be empty";
             }
 
-            if (memoryStream == null && File.Exists (fileName))
+            if (memoryStream == null && File.Exists(fileName))
             {
                 memoryStream = new MemoryStream();
                 using FileStream source = File.Open(fileName, FileMode.Open);
@@ -67,7 +67,7 @@ public partial class DownloadBlob : IAsyncDisposable
             if (memoryStream != null)
             {
                 using var streamRef = new DotNetStreamReference(stream: memoryStream);
-                await module!.InvokeVoidAsync(isAndroid? "downloadFileFromStreamToDataUrl" : "downloadFileFromStream", Path.GetFileName(fileName), streamRef);
+                await module!.InvokeVoidAsync(isAndroid ? "downloadFileFromStreamToDataUrl" : "downloadFileFromStream", Path.GetFileName(fileName), streamRef);
                 return "OK";
             }
             else

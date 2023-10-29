@@ -5,8 +5,6 @@
 // **********************************
 
 
-using System;
-using System.ComponentModel;
 using UAParser;
 
 namespace BootstrapBlazor.Components;

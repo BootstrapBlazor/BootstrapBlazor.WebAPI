@@ -130,7 +130,7 @@ public class WebSerialOptions
     /// 自动检查状态
     /// </summary>
     [DisplayName("自动检查状态")]
-    public bool AutoGetSignals { get; set; } 
+    public bool AutoGetSignals { get; set; }
 
 }
 

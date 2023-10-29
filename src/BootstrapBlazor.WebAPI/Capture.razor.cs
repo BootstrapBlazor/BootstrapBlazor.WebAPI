@@ -6,7 +6,6 @@
 
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
-using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 using System.Text.RegularExpressions;
 
@@ -17,7 +16,7 @@ namespace BootstrapBlazor.Components;
 /// </summary>
 public partial class Capture : IAsyncDisposable
 {
-    [Inject] IJSRuntime? JS { get; set; }
+    [Inject] private IJSRuntime? JS { get; set; }
     private IJSObjectReference? module;
     private DotNetObjectReference<Capture>? Instance { get; set; }
 

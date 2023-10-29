@@ -16,7 +16,7 @@ namespace BootstrapBlazor.Components;
 /// </summary>
 public partial class WebApi : IAsyncDisposable
 {
-    [Inject] IJSRuntime? JS { get; set; }
+    [Inject] private IJSRuntime? JS { get; set; }
     private IJSObjectReference? module;
 
     private DotNetObjectReference<WebApi>? Instance { get; set; }
@@ -46,7 +46,7 @@ public partial class WebApi : IAsyncDisposable
     [Parameter]
     public bool ShowInfo { get; set; }
 
-    string? UserAgents { get; set; }
+    private string? UserAgents { get; set; }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -168,11 +168,11 @@ public partial class WebApi : IAsyncDisposable
     /// <param name="text">分享文本</param>
     /// <param name="url">分享链接</param>
     /// <returns></returns>
-    public virtual async Task Share(string title, string text, string url, string? files=null)
+    public virtual async Task Share(string title, string text, string url, string? files = null)
     {
         try
         {
-            if (!string.IsNullOrWhiteSpace (files))
+            if (!string.IsNullOrWhiteSpace(files))
             {
                 await module!.InvokeVoidAsync("Share", title, text, url, files);
             }
