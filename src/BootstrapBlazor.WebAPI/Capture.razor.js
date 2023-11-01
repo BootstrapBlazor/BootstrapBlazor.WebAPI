@@ -129,6 +129,10 @@
                                                 sourceOption.text = device.label
                                             }
                                             sourceOption.value = device.deviceId
+                                            if (options.deviceID != null && device.deviceId == options.deviceID)
+                                            {
+                                                sourceOption.selected = true
+                                            } 
                                             sourceSelect.appendChild(sourceOption)
                                             selectedDeviceId = device.deviceId;
                                         }
