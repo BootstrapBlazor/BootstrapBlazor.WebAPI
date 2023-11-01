@@ -121,7 +121,7 @@ public partial class Capture : IAsyncDisposable
     public string? DeviceID { get; set; }
 
     /// <summary>
-    /// 保存最后使用设备ID下次自动调用
+    /// 保存最后使用设备ID下次自动调用, 默认 true
     /// </summary>
     [Parameter]
     public bool SaveDeviceID { get; set; } = true;
