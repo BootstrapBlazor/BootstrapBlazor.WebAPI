@@ -84,10 +84,12 @@
                     }, audio: false
                 };
 
-                if (selectedDeviceId != null) {
+                if (selectedDeviceId != null || options.deviceID != null) {
+                    let deviceId = selectedDeviceId;
+                    if (deviceId == null) deviceId = options.deviceID;
                     constraints = {
                         video: {
-                            deviceId: selectedDeviceId ? { exact: selectedDeviceId } : undefined,
+                            deviceId: deviceId ? { exact: deviceId } : undefined,
                             width: { ideal: options.width },
                             height: { ideal: options.height },
                             facingMode: "environment",
@@ -135,6 +137,7 @@
                                     sourceSelect.onchange = () => {
                                         selectedDeviceId = sourceSelect.value;
                                         if (options.debug) console.log(`selectedDevice: ${sourceSelect.options[sourceSelect.selectedIndex].text} id = ${sourceSelect.value}`);
+                                        instance.invokeMethodAsync('SelectDeviceID', selectedDeviceId);
                                         startup();
                                     }
 

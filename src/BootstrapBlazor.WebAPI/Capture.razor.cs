@@ -4,10 +4,12 @@
 // e-mail:zhouchuanglin@gmail.com 
 // **********************************
 
+using BootstrapBlazor.WebAPI.Services;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 using System.Diagnostics.CodeAnalysis;
 using System.Text.RegularExpressions;
+using UAParser;
 
 namespace BootstrapBlazor.Components;
 
@@ -19,6 +21,9 @@ public partial class Capture : IAsyncDisposable
     [Inject] private IJSRuntime? JS { get; set; }
     private IJSObjectReference? module;
     private DotNetObjectReference<Capture>? Instance { get; set; }
+
+    [Inject, NotNull]
+    public IStorage? Storage { get; set; }
 
     /// <summary>
     /// UI界面元素的引用对象
@@ -91,7 +96,6 @@ public partial class Capture : IAsyncDisposable
     [Parameter]
     public double Quality { get; set; } = 0.8d;
 
-
     /// <summary>
     /// 图像宽度
     /// </summary>
@@ -110,6 +114,18 @@ public partial class Capture : IAsyncDisposable
     [Parameter]
     public string SelectDeviceBtnTitle { get; set; } = "选择设备";
 
+    /// <summary>
+    /// 指定摄像头设备ID
+    /// </summary>
+    [Parameter]
+    public string? DeviceID { get; set; }
+
+    /// <summary>
+    /// 保存最后使用设备ID下次自动调用
+    /// </summary>
+    [Parameter]
+    public bool SaveDeviceID { get; set; } = true;
+
     protected override void OnInitialized()
     {
         CaptureBtnTitle = CaptureBtnTitle ?? (Camera ? "拍照" : "截屏");
@@ -121,8 +137,16 @@ public partial class Capture : IAsyncDisposable
         {
             if (firstRender)
             {
-                module = await JS!.InvokeAsync<IJSObjectReference>("import", "./_content/BootstrapBlazor.WebAPI/capture.js" + "?v=" + System.Reflection.Assembly.GetExecutingAssembly().GetName().Version);
+                module = await JS!.InvokeAsync<IJSObjectReference>("import", "./_content/BootstrapBlazor.WebAPI/Capture.razor.js" + "?v=" + System.Reflection.Assembly.GetExecutingAssembly().GetName().Version);
                 Instance = DotNetObjectReference.Create(this);
+                try
+                {
+                    if (SaveDeviceID) DeviceID = await Storage.GetValue("CamsDeviceID", DeviceID);
+                }
+                catch (Exception)
+                {
+
+                }
                 if (Auto)
                     await Start();
             }
@@ -168,11 +192,29 @@ public partial class Capture : IAsyncDisposable
             Options.Quality = Quality;
             Options.Width = Width;
             Options.Height = Height;
+            Options.DeviceID = DeviceID;
             await module!.InvokeVoidAsync("Capture", Instance, Element, Options, "Start");
         }
         catch (Exception e)
         {
             if (OnError != null) await OnError.Invoke(e.Message);
+        }
+    }
+
+    /// <summary>
+    /// 选择摄像头回调方法
+    /// </summary>
+    /// <param name="base64encodedstring"></param>
+    /// <returns></returns>
+    [JSInvokable]
+    public async Task SelectDeviceID(string deviceID)
+    {
+        try
+        {
+            if (SaveDeviceID) await Storage.SetValue("CamsDeviceID", deviceID);
+        }
+        catch 
+        {
         }
     }
 

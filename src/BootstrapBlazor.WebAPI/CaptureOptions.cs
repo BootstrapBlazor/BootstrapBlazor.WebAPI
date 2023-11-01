@@ -5,6 +5,7 @@
 // **********************************
 
 
+using Microsoft.AspNetCore.Components;
 using System.ComponentModel;
 
 namespace BootstrapBlazor.Components;
@@ -53,5 +54,10 @@ public class CaptureOptions
     [DisplayName("图像高度")]
     public int? Height { get; set; }
 
+    /// <summary>
+    /// 指定摄像头设备ID
+    /// </summary>
+    [DisplayName("指定摄像头设备ID")]
+    public string? DeviceID { get; set; }
 
 }
