@@ -86,7 +86,7 @@ https://blazor.app1.es/Speechs
 #### 更新历史
 
 v7.5.2
-- Capture 添加 1.保存最后使用设备ID下次自动调用, 2.指定摄像头设备ID
+- UploadToBase64 添加外层用户自定义样式
 
 v7.5.1
 - Capture 添加 1.保存最后使用设备ID下次自动调用, 2.指定摄像头设备ID
