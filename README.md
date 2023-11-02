@@ -85,6 +85,39 @@ https://blazor.app1.es/Speechs
 ----
 #### 更新历史
 
+v7.5.2
+- Capture 添加 1.保存最后使用设备ID下次自动调用, 2.指定摄像头设备ID
+
+v7.5.1
+- Capture 添加 1.保存最后使用设备ID下次自动调用, 2.指定摄像头设备ID
+
+v7.5.0
+- WebVoice 优化
+
+v7.4.5
+- 添加查询语音合成发音状态
+
+v7.4.2
+- WebSerial 自动检查状态
+
+v7.4.2
+- WebSerial 添加信号数据处理
+
+v7.4.0
+- WebSpeech 语音识别优化
+
+v7.3.6
+- WebSerial 添加 自动连接设备/自动断帧方式/Break/DTR/RTS/按钮文本自定义
+
+v7.3.5
+- WebSerial 添加 连接状态/HEX发送/HEX接收/自动断帧/断帧字符
+
+v7.2.7 - 7.3.4
+- 添加 WebSpeech 语音识别/合成组件
+
+v7.2.4
+- 添加 串口读写 WebSerial组件
+
 v7.2.2
 - Capture 组件添加指定高宽,可保存高质量图片
 
@@ -92,36 +125,6 @@ v7.2
 - 添加 Cookie / LocalStorage 服务
 - 添加 上传图片 UploadToBase64 组件
 - Capture 组件优化
-
-v7.2.4
-- 添加 串口读写 WebSerial组件
-
-v7.2.7 - 7.3.4
-- 添加 WebSpeech 语音识别/合成组件
-
-v7.3.5
-- WebSerial 添加 连接状态/HEX发送/HEX接收/自动断帧/断帧字符
-
-v7.3.6
-- WebSerial 添加 自动连接设备/自动断帧方式/Break/DTR/RTS/按钮文本自定义
-
-v7.4.0
-- WebSpeech 语音识别优化
-
-v7.4.2
-- WebSerial 添加信号数据处理
-
-v7.4.2
-- WebSerial 自动检查状态
-
-v7.4.5
-- 添加查询语音合成发音状态
-
-v7.5.0
-- WebVoice 优化
-
-v7.5.1
-- Capture 添加 1.保存最后使用设备ID下次自动调用, 2.指定摄像头设备ID
 
 ---
 #### Blazor 组件

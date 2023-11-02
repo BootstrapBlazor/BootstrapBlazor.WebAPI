@@ -4,9 +4,9 @@
 @code{
     string id = Guid.NewGuid().ToString("N");
 }
-<div>
+<div class="@CssClass">
 
-    <label for="@id" class="input-label" style="@Style">@UploadButtonText</label>
+    <label for="@id" class="@(CssClass!=null?"":"input-label")" style="@Style">@UploadButtonText</label>
 
     @if (Capture && CaptureUser)
     {

@@ -67,6 +67,12 @@ public partial class UploadToBase64
     /// 获得/设置 用户自定义样式
     /// </summary>
     [Parameter]
+    public string? CssClass { get; set; }
+
+    /// <summary>
+    /// 获得/设置 用户自定义样式2
+    /// </summary>
+    [Parameter]
     public string? Style { get; set; }
 
     /// <summary>
