@@ -142,7 +142,7 @@
                                                 sourceOption.text = device.label
                                             }
                                             sourceOption.value = device.deviceId
-                                            if (options.deviceID != null && device.deviceId == options.deviceID)
+                                            if (selectedDeviceId != null && device.deviceId == selectedDeviceId)
                                             {
                                                 sourceOption.selected = true;
                                             } 
