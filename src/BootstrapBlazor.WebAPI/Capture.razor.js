@@ -119,6 +119,19 @@
                         if (selectedDeviceId == null) {
                             navigator.mediaDevices.enumerateDevices()
                                 .then((devices) => {
+                                    let videoInputDevices = [];
+                                    devices.forEach((device) => {
+                                        if (device.kind === 'videoinput') {
+                                            videoInputDevices.push(device);
+                                        }
+                                    });
+                                    if (options.deviceID != null) {
+                                        selectedDeviceId = options.deviceID
+                                    } else if (videoInputDevices.length > 1) {
+                                        selectedDeviceId = videoInputDevices[1].deviceId
+                                    } else {
+                                        selectedDeviceId = videoInputDevices[0].deviceId
+                                    }
                                     devices.forEach((device) => {
                                         if (device.kind === 'videoinput') {
                                             if (options.debug) console.log(`${device.label} id = ${device.deviceId}`);
@@ -131,10 +144,9 @@
                                             sourceOption.value = device.deviceId
                                             if (options.deviceID != null && device.deviceId == options.deviceID)
                                             {
-                                                sourceOption.selected = true
+                                                sourceOption.selected = true;
                                             } 
                                             sourceSelect.appendChild(sourceOption)
-                                            selectedDeviceId = device.deviceId;
                                         }
                                     });
 

@@ -85,6 +85,9 @@ https://blazor.app1.es/Speechs
 ----
 #### 更新历史
 
+v8.0.1
+- 优化Capture调用已保存摄像头设备ID性能
+ 
 v7.5.2
 - UploadToBase64 添加外层用户自定义样式
 
