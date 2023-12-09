@@ -16,7 +16,7 @@ namespace BootstrapBlazor.Components;
 /// </summary>
 public partial class WebApi : IAsyncDisposable
 {
-    [Inject] private IJSRuntime? JS { get; set; }
+    [Inject] private IJSRuntime? JSRuntime { get; set; }
     private IJSObjectReference? Module { get; set; }
 
     private DotNetObjectReference<WebApi>? Instance { get; set; }
@@ -54,7 +54,7 @@ public partial class WebApi : IAsyncDisposable
         {
             if (firstRender)
             {
-                Module = await JS!.InvokeAsync<IJSObjectReference>("import", "./_content/BootstrapBlazor.WebAPI/app.js" + "?v=" + System.Reflection.Assembly.GetExecutingAssembly().GetName().Version);
+                Module = await JSRuntime.InvokeAsync<IJSObjectReference>("import", "./_content/BootstrapBlazor.WebAPI/app.js" + "?v=" + System.Reflection.Assembly.GetExecutingAssembly().GetName().Version);
                 Instance = DotNetObjectReference.Create(this);
                 if (OnBatteryResult != null) await GetBattery();
                 if (OnNetworkInfoResult != null) await GetNetworkInfo();
@@ -179,7 +179,7 @@ public partial class WebApi : IAsyncDisposable
             else
             {
                 var txt = $@"navigator.share({{title: '{title}',  text: '{text}',  url: '{url}' }});";
-                await JS!.InvokeVoidAsync("eval", $"let discard ={txt}");
+                await JSRuntime.InvokeVoidAsync("eval", $"let discard ={txt}");
             }
         }
         catch (Exception e)

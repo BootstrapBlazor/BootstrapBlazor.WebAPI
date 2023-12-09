@@ -18,7 +18,7 @@ namespace BootstrapBlazor.Components;
 /// </summary>
 public partial class Capture : IAsyncDisposable
 {
-    [Inject] private IJSRuntime? JS { get; set; }
+    [Inject] private IJSRuntime? JSRuntime { get; set; }
     private IJSObjectReference? Module { get; set; }
     private DotNetObjectReference<Capture>? Instance { get; set; }
 
@@ -137,7 +137,7 @@ public partial class Capture : IAsyncDisposable
         {
             if (firstRender)
             {
-                Module = await JS!.InvokeAsync<IJSObjectReference>("import", "./_content/BootstrapBlazor.WebAPI/Capture.razor.js" + "?v=" + System.Reflection.Assembly.GetExecutingAssembly().GetName().Version);
+                Module = await JSRuntime.InvokeAsync<IJSObjectReference>("import", "./_content/BootstrapBlazor.WebAPI/Capture.razor.js" + "?v=" + System.Reflection.Assembly.GetExecutingAssembly().GetName().Version);
                 Instance = DotNetObjectReference.Create(this);
                 try
                 {
