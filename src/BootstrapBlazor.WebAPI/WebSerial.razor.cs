@@ -23,7 +23,7 @@ namespace BootstrapBlazor.Components;
 public partial class WebSerial : IAsyncDisposable
 {
     [Inject] private IJSRuntime? JS { get; set; }
-    private IJSObjectReference? module;
+    private IJSObjectReference? Module { get; set; }
     private DotNetObjectReference<WebSerial>? Instance { get; set; }
 
     /// <summary>
@@ -143,15 +143,15 @@ public partial class WebSerial : IAsyncDisposable
 
             if (firstRender)
             {
-                module = await JS!.InvokeAsync<IJSObjectReference>("import", "./_content/BootstrapBlazor.WebAPI/WebSerial.razor.js" + "?v=" + System.Reflection.Assembly.GetExecutingAssembly().GetName().Version);
+                Module = await JS!.InvokeAsync<IJSObjectReference>("import", "./_content/BootstrapBlazor.WebAPI/WebSerial.razor.js" + "?v=" + System.Reflection.Assembly.GetExecutingAssembly().GetName().Version);
                 Instance = DotNetObjectReference.Create(this);
-                await module!.InvokeVoidAsync("Init", Instance, Element, Options, "Start");
+                await Module!.InvokeVoidAsync("Init", Instance, Element, Options, "Start");
                 OptionsCache = Options;
             }
 
-            if (!firstRender && module != null && OptionsCache != Options)
+            if (!firstRender && Module != null && OptionsCache != Options)
             {
-                await module!.InvokeVoidAsync("Init", Instance, Element, Options, "Start");
+                await Module!.InvokeVoidAsync("Init", Instance, Element, Options, "Start");
                 OptionsCache = Options;
             }
 
@@ -170,9 +170,9 @@ public partial class WebSerial : IAsyncDisposable
     async ValueTask IAsyncDisposable.DisposeAsync()
     {
         Instance?.Dispose();
-        if (module is not null)
+        if (Module is not null)
         {
-            await module.DisposeAsync();
+            await Module.DisposeAsync();
         }
     }
 
@@ -183,7 +183,7 @@ public partial class WebSerial : IAsyncDisposable
     {
         try
         {
-            await module!.InvokeVoidAsync("Init", Instance, Element, Options, "Start");
+            await Module!.InvokeVoidAsync("Init", Instance, Element, Options, "Start");
         }
         catch
         {
@@ -197,7 +197,7 @@ public partial class WebSerial : IAsyncDisposable
     {
         try
         {
-            await module!.InvokeVoidAsync("forget", Instance);
+            await Module!.InvokeVoidAsync("forget", Instance);
         }
         catch
         {
@@ -280,7 +280,7 @@ public partial class WebSerial : IAsyncDisposable
     {
         try
         {
-            await module!.InvokeVoidAsync("setSignals", Instance, signals);
+            await Module!.InvokeVoidAsync("setSignals", Instance, signals);
         }
         catch
         {
@@ -295,7 +295,7 @@ public partial class WebSerial : IAsyncDisposable
     {
         try
         {
-            Signals = await module!.InvokeAsync<WebSerialSignals>("getSignals", Instance);
+            Signals = await Module!.InvokeAsync<WebSerialSignals>("getSignals", Instance);
             //add  callback
         }
         catch

@@ -20,7 +20,7 @@ namespace BootstrapBlazor.Components;
 public partial class WebSpeech : IAsyncDisposable
 {
     [Inject] private IJSRuntime? JS { get; set; }
-    private IJSObjectReference? module;
+    private IJSObjectReference? Module { get; set; }
     private DotNetObjectReference<WebSpeech>? Instance { get; set; }
 
     /// <summary>
@@ -61,7 +61,7 @@ public partial class WebSpeech : IAsyncDisposable
         {
             if (firstRender)
             {
-                module = await JS!.InvokeAsync<IJSObjectReference>("import", "./_content/BootstrapBlazor.WebAPI/WebSpeech.razor.js" + "?v=" + System.Reflection.Assembly.GetExecutingAssembly().GetName().Version);
+                Module = await JS!.InvokeAsync<IJSObjectReference>("import", "./_content/BootstrapBlazor.WebAPI/WebSpeech.razor.js" + "?v=" + System.Reflection.Assembly.GetExecutingAssembly().GetName().Version);
                 Instance = DotNetObjectReference.Create(this);
                 await InitWebapi();
             }
@@ -102,7 +102,7 @@ public partial class WebSpeech : IAsyncDisposable
     {
         try
         {
-            await module!.InvokeVoidAsync("InitWebapi", Instance, Element);
+            await Module!.InvokeVoidAsync("InitWebapi", Instance, Element);
         }
         catch (Exception e)
         {
@@ -132,7 +132,7 @@ public partial class WebSpeech : IAsyncDisposable
     {
         try
         {
-            return await module!.InvokeAsync<string>("SpeechRecognition", Instance, lang ?? "zh-CN", continuous, interimResults, maxAlternatives);
+            return await Module!.InvokeAsync<string>("SpeechRecognition", Instance, lang ?? "zh-CN", continuous, interimResults, maxAlternatives);
         }
         catch (Exception e)
         {
@@ -150,7 +150,7 @@ public partial class WebSpeech : IAsyncDisposable
         try
         {
             option = option ?? new SpeechRecognitionOption();
-            return await module!.InvokeAsync<string>("SpeechRecognitionDemo", Instance, lang ?? "zh-CN", option.Continuous, option.InterimResults);
+            return await Module!.InvokeAsync<string>("SpeechRecognitionDemo", Instance, lang ?? "zh-CN", option.Continuous, option.InterimResults);
         }
         catch (Exception e)
         {
@@ -185,7 +185,7 @@ public partial class WebSpeech : IAsyncDisposable
     {
         try
         {
-            await module!.InvokeVoidAsync("SpeechSynthesis", Instance, text, lang ?? "zh-CN", rate, picth, volume, voiceURI);
+            await Module!.InvokeVoidAsync("SpeechSynthesis", Instance, text, lang ?? "zh-CN", rate, picth, volume, voiceURI);
         }
         catch (Exception e)
         {
@@ -197,7 +197,7 @@ public partial class WebSpeech : IAsyncDisposable
     {
         try
         {
-            var res = await module!.InvokeAsync<bool>("SpeechRecognitionStop", Instance);
+            var res = await Module!.InvokeAsync<bool>("SpeechRecognitionStop", Instance);
         }
         catch (Exception e)
         {
@@ -209,7 +209,7 @@ public partial class WebSpeech : IAsyncDisposable
     {
         try
         {
-            var res = await module!.InvokeAsync<bool>("SpeechStop", Instance);
+            var res = await Module!.InvokeAsync<bool>("SpeechStop", Instance);
         }
         catch (Exception e)
         {
@@ -221,7 +221,7 @@ public partial class WebSpeech : IAsyncDisposable
     {
         try
         {
-            return await module!.InvokeAsync<bool>("Speaking", Instance);
+            return await Module!.InvokeAsync<bool>("Speaking", Instance);
         }
         catch (Exception e)
         {
@@ -252,12 +252,12 @@ public partial class WebSpeech : IAsyncDisposable
     {
         try
         {
-            List<WebVoice> res = await module!.InvokeAsync<List<WebVoice>>("GetVoiceList", Instance);
+            List<WebVoice> res = await Module!.InvokeAsync<List<WebVoice>>("GetVoiceList", Instance);
             var retry = 0;
             while ((res == null || res.Count == 0) && !SpeechUndefined)
             {
                 await Task.Delay(200);
-                res = await module!.InvokeAsync<List<WebVoice>>("GetVoiceList", Instance);
+                res = await Module!.InvokeAsync<List<WebVoice>>("GetVoiceList", Instance);
                 retry++;
                 if (retry == 5 || SpeechUndefined)
                 {
@@ -283,9 +283,9 @@ public partial class WebSpeech : IAsyncDisposable
     async ValueTask IAsyncDisposable.DisposeAsync()
     {
         Instance?.Dispose();
-        if (module is not null)
+        if (Module is not null)
         {
-            await module.DisposeAsync();
+            await Module.DisposeAsync();
         }
     }
 

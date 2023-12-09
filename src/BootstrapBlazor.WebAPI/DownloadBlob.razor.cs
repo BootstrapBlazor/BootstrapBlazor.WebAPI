@@ -15,7 +15,7 @@ namespace BootstrapBlazor.Components;
 public partial class DownloadBlob : IAsyncDisposable
 {
     [Inject] private IJSRuntime? JS { get; set; }
-    private IJSObjectReference? module;
+    private IJSObjectReference? Module { get; set; }
 
     private DotNetObjectReference<DownloadBlob>? Instance { get; set; }
 
@@ -32,7 +32,7 @@ public partial class DownloadBlob : IAsyncDisposable
         {
             if (firstRender)
             {
-                module = await JS!.InvokeAsync<IJSObjectReference>("import", "./_content/BootstrapBlazor.WebAPI/download.js" + "?v=" + System.Reflection.Assembly.GetExecutingAssembly().GetName().Version);
+                Module = await JS!.InvokeAsync<IJSObjectReference>("import", "./_content/BootstrapBlazor.WebAPI/download.js" + "?v=" + System.Reflection.Assembly.GetExecutingAssembly().GetName().Version);
                 Instance = DotNetObjectReference.Create(this);
             }
         }
@@ -67,7 +67,7 @@ public partial class DownloadBlob : IAsyncDisposable
             if (memoryStream != null)
             {
                 using var streamRef = new DotNetStreamReference(stream: memoryStream);
-                await module!.InvokeVoidAsync(isAndroid ? "downloadFileFromStreamToDataUrl" : "downloadFileFromStream", Path.GetFileName(fileName), streamRef);
+                await Module!.InvokeVoidAsync(isAndroid ? "downloadFileFromStreamToDataUrl" : "downloadFileFromStream", Path.GetFileName(fileName), streamRef);
                 return "OK";
             }
             else
@@ -85,14 +85,14 @@ public partial class DownloadBlob : IAsyncDisposable
 
     public virtual async Task DownloadFileFromURL(string fileName, string fileURL)
     {
-        await module!.InvokeVoidAsync("downloadFileFromUrl", fileName, fileURL);
+        await Module!.InvokeVoidAsync("downloadFileFromUrl", fileName, fileURL);
     }
 
     async ValueTask IAsyncDisposable.DisposeAsync()
     {
-        if (module is not null)
+        if (Module is not null)
         {
-            await module.DisposeAsync();
+            await Module.DisposeAsync();
         }
     }
 

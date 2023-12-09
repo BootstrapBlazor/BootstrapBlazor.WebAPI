@@ -19,7 +19,7 @@ namespace BootstrapBlazor.Components;
 public partial class Capture : IAsyncDisposable
 {
     [Inject] private IJSRuntime? JS { get; set; }
-    private IJSObjectReference? module;
+    private IJSObjectReference? Module { get; set; }
     private DotNetObjectReference<Capture>? Instance { get; set; }
 
     [Inject, NotNull]
@@ -137,7 +137,7 @@ public partial class Capture : IAsyncDisposable
         {
             if (firstRender)
             {
-                module = await JS!.InvokeAsync<IJSObjectReference>("import", "./_content/BootstrapBlazor.WebAPI/Capture.razor.js" + "?v=" + System.Reflection.Assembly.GetExecutingAssembly().GetName().Version);
+                Module = await JS!.InvokeAsync<IJSObjectReference>("import", "./_content/BootstrapBlazor.WebAPI/Capture.razor.js" + "?v=" + System.Reflection.Assembly.GetExecutingAssembly().GetName().Version);
                 Instance = DotNetObjectReference.Create(this);
                 try
                 {
@@ -159,16 +159,16 @@ public partial class Capture : IAsyncDisposable
 
     public async Task Dispose()
     {
-        await module!.InvokeVoidAsync("Capture", Instance, Element, Options, "Destroy");
+        await Module!.InvokeVoidAsync("Capture", Instance, Element, Options, "Destroy");
     }
 
     async ValueTask IAsyncDisposable.DisposeAsync()
     {
-        await module!.InvokeVoidAsync("Capture", Instance, Element, Options, "Destroy");
+        await Module!.InvokeVoidAsync("Capture", Instance, Element, Options, "Destroy");
         Instance?.Dispose();
-        if (module is not null)
+        if (Module is not null)
         {
-            await module.DisposeAsync();
+            await Module.DisposeAsync();
         }
     }
 
@@ -193,7 +193,7 @@ public partial class Capture : IAsyncDisposable
             Options.Width = Width;
             Options.Height = Height;
             Options.DeviceID = DeviceID;
-            await module!.InvokeVoidAsync("Capture", Instance, Element, Options, "Start");
+            await Module!.InvokeVoidAsync("Capture", Instance, Element, Options, "Start");
         }
         catch (Exception e)
         {

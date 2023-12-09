@@ -17,7 +17,7 @@ namespace BootstrapBlazor.Components;
 public partial class WebApi : IAsyncDisposable
 {
     [Inject] private IJSRuntime? JS { get; set; }
-    private IJSObjectReference? module;
+    private IJSObjectReference? Module { get; set; }
 
     private DotNetObjectReference<WebApi>? Instance { get; set; }
     private UAInfo? ClientInfo { get; set; }
@@ -54,13 +54,13 @@ public partial class WebApi : IAsyncDisposable
         {
             if (firstRender)
             {
-                module = await JS!.InvokeAsync<IJSObjectReference>("import", "./_content/BootstrapBlazor.WebAPI/app.js" + "?v=" + System.Reflection.Assembly.GetExecutingAssembly().GetName().Version);
+                Module = await JS!.InvokeAsync<IJSObjectReference>("import", "./_content/BootstrapBlazor.WebAPI/app.js" + "?v=" + System.Reflection.Assembly.GetExecutingAssembly().GetName().Version);
                 Instance = DotNetObjectReference.Create(this);
                 if (OnBatteryResult != null) await GetBattery();
                 if (OnNetworkInfoResult != null) await GetNetworkInfo();
                 if (OnUserAgentResult != null)
                 {
-                    var userAgent = await module!.InvokeAsync<string>("getUserAgent");
+                    var userAgent = await Module!.InvokeAsync<string>("getUserAgent");
                     var parser = Parser.GetDefault();
                     var clientInfo = parser.Parse(userAgent);
                     ClientInfo = new UAInfo(clientInfo.String, clientInfo.OS, clientInfo.Device, clientInfo.UA);
@@ -82,9 +82,9 @@ public partial class WebApi : IAsyncDisposable
 
     async ValueTask IAsyncDisposable.DisposeAsync()
     {
-        if (module is not null)
+        if (Module is not null)
         {
-            await module.DisposeAsync();
+            await Module.DisposeAsync();
         }
     }
 
@@ -95,7 +95,7 @@ public partial class WebApi : IAsyncDisposable
     {
         try
         {
-            await module!.InvokeVoidAsync("GetBattery", Instance);
+            await Module!.InvokeVoidAsync("GetBattery", Instance);
         }
         catch (Exception e)
         {
@@ -129,7 +129,7 @@ public partial class WebApi : IAsyncDisposable
     {
         try
         {
-            await module!.InvokeVoidAsync("GetNetworkInfo", Instance);
+            await Module!.InvokeVoidAsync("GetNetworkInfo", Instance);
         }
         catch (Exception e)
         {
@@ -174,7 +174,7 @@ public partial class WebApi : IAsyncDisposable
         {
             if (!string.IsNullOrWhiteSpace(files))
             {
-                await module!.InvokeVoidAsync("Share", title, text, url, files);
+                await Module!.InvokeVoidAsync("Share", title, text, url, files);
             }
             else
             {
@@ -197,7 +197,7 @@ public partial class WebApi : IAsyncDisposable
     {
         try
         {
-            return await module!.InvokeAsync<string>("ScreenOrientation", screen.ToString());
+            return await Module!.InvokeAsync<string>("ScreenOrientation", screen.ToString());
         }
         catch (Exception e)
         {
@@ -215,7 +215,7 @@ public partial class WebApi : IAsyncDisposable
     {
         try
         {
-            await module!.InvokeVoidAsync("ScreenRecord", Instance, "start");
+            await Module!.InvokeVoidAsync("ScreenRecord", Instance, "start");
         }
         catch (Exception e)
         {
@@ -232,7 +232,7 @@ public partial class WebApi : IAsyncDisposable
     {
         try
         {
-            return await module!.InvokeAsync<string>("ScreenRecord", Instance, "stop", uploadToServer);
+            return await Module!.InvokeAsync<string>("ScreenRecord", Instance, "stop", uploadToServer);
         }
         catch (Exception e)
         {
@@ -250,7 +250,7 @@ public partial class WebApi : IAsyncDisposable
     {
         try
         {
-            return await module!.InvokeAsync<string[]>("ScreenRecord", Instance, "getTypeSupported");
+            return await Module!.InvokeAsync<string[]>("ScreenRecord", Instance, "getTypeSupported");
         }
         catch (Exception e)
         {
