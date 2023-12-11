@@ -13,8 +13,12 @@
                    x5-video-player-type="h5"
                    x5-video-player-fullscreen="true"
                    x5-video-orientation="portraint">
-                    Video stream not available.</video>
-            <button data-action="startbutton" class="startbutton">@CaptureBtnTitle</button>
+                Video stream not available.
+            </video>
+            @if (ShowCaptureButton)
+            {
+                <button data-action="startbutton" class="startbutton">@CaptureBtnTitle</button>
+            }
         </div>
 
         <div data-action="sourceSelectPanel" style="display:none">
@@ -31,7 +35,7 @@
                 <img data-action="photo" class="photo" alt="屏幕截图结果." />
             </div>
         }
-        </div>
+    </div>
 }
 @if (Debug)
 {

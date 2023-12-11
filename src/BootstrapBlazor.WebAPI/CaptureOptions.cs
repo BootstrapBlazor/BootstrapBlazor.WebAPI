@@ -60,4 +60,65 @@ public class CaptureOptions
     [DisplayName("指定摄像头设备ID")]
     public string? DeviceID { get; set; }
 
+    /// <summary>
+    /// 图像效果预览
+    /// </summary>
+    [DisplayName("图像效果预览")]
+    public bool EffectPreview { get; set; }
+
+    /// <summary>
+    /// 图像效果
+    /// </summary>
+    [DisplayName("图像效果")]
+    public EnmuCaptureEffect Effect { get; set; }= EnmuCaptureEffect.None;
+
+}
+
+public enum EnmuCaptureType
+{
+    /// <summary>
+    // 摄像头
+    /// </summary>
+    Camera,
+    /// <summary>
+    /// 屏幕
+    /// </summary>
+    Screen
+}
+
+public enum EnmuCaptureEffect
+{
+    //https://juejin.cn/post/7119893640264024071
+
+    None,
+
+    反色,
+
+    灰度,
+
+    反色_灰度,
+
+    黑白,
+
+    调亮,
+
+    调暗,
+
+    透明度,
+
+    模糊,
+
+    RGB蒙版,
+
+    老照片滤镜,
+
+    马赛克,
+
+    RGB通道_红,
+
+    RGB通道_绿,
+
+    RGB通道_蓝,
+
+    反色_黑白,
 }

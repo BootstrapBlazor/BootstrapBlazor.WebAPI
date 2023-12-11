@@ -6,6 +6,7 @@
 
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
+using System.Diagnostics.CodeAnalysis;
 using System.Reflection.Metadata;
 using UAParser;
 
@@ -16,7 +17,10 @@ namespace BootstrapBlazor.Components;
 /// </summary>
 public partial class WebApi : IAsyncDisposable
 {
-    [Inject] private IJSRuntime? JSRuntime { get; set; }
+    [Inject]
+    [NotNull]
+    private IJSRuntime? JSRuntime { get; set; }
+
     private IJSObjectReference? Module { get; set; }
 
     private DotNetObjectReference<WebApi>? Instance { get; set; }

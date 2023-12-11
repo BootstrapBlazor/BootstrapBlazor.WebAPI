@@ -18,11 +18,15 @@ namespace BootstrapBlazor.Components;
 /// </summary>
 public partial class Capture : IAsyncDisposable
 {
-    [Inject] private IJSRuntime? JSRuntime { get; set; }
+    [Inject]
+    [NotNull]
+    private IJSRuntime? JSRuntime { get; set; }
+
     private IJSObjectReference? Module { get; set; }
     private DotNetObjectReference<Capture>? Instance { get; set; }
 
-    [Inject, NotNull]
+    [Inject]
+    [NotNull]
     public IStorage? Storage { get; set; }
 
     /// <summary>
@@ -30,7 +34,8 @@ public partial class Capture : IAsyncDisposable
     /// </summary>
     public ElementReference Element { get; set; }
 
-    private CaptureOptions? Options { get; set; } = new CaptureOptions();
+    [Parameter]
+    public CaptureOptions? Options { get; set; } = new CaptureOptions();
 
     /// <summary>
     /// 获得/设置 错误回调方法
@@ -51,11 +56,24 @@ public partial class Capture : IAsyncDisposable
     public Func<string, Task>? OnCapture { get; set; }
 
     /// <summary>
+    /// 获得/设置 扫码回调方法
+    /// </summary>
+    [Parameter]
+    public Func<string, Task>? OnDecode { get; set; }
+
+    /// <summary>
     /// 截图按钮文本/Capture button title
     /// </summary>
     [Parameter]
     [NotNull]
     public string? CaptureBtnTitle { get; set; }
+
+    /// <summary>
+    /// 显示截图按钮/ Show capture button
+    /// </summary>
+    [Parameter]
+    [NotNull]
+    public bool ShowCaptureButton { get; set; } = true;
 
     /// <summary>
     /// 获得/设置 持续获取截图
@@ -126,6 +144,11 @@ public partial class Capture : IAsyncDisposable
     [Parameter]
     public bool SaveDeviceID { get; set; } = true;
 
+    [Parameter]
+    public string? Command { get; set; } 
+
+    private bool FirstRender { get; set; } = true;
+
     protected override void OnInitialized()
     {
         CaptureBtnTitle = CaptureBtnTitle ?? (Camera ? "拍照" : "截屏");
@@ -137,6 +160,7 @@ public partial class Capture : IAsyncDisposable
         {
             if (firstRender)
             {
+                FirstRender = false;
                 Module = await JSRuntime.InvokeAsync<IJSObjectReference>("import", "./_content/BootstrapBlazor.WebAPI/Capture.razor.js" + "?v=" + System.Reflection.Assembly.GetExecutingAssembly().GetName().Version);
                 Instance = DotNetObjectReference.Create(this);
                 try
@@ -157,14 +181,20 @@ public partial class Capture : IAsyncDisposable
         }
     }
 
+    protected override async Task OnParametersSetAsync()
+    {
+        if (FirstRender) return; 
+        await Apply();
+    }
+
     public async Task Dispose()
     {
-        await Module!.InvokeVoidAsync("Capture", Instance, Element, Options, "Destroy");
+        await Module!.InvokeVoidAsync("Capture", Instance, Element, Options, "destroy");
     }
 
     async ValueTask IAsyncDisposable.DisposeAsync()
     {
-        await Module!.InvokeVoidAsync("Capture", Instance, Element, Options, "Destroy");
+        await Module!.InvokeVoidAsync("Capture", Instance, Element, Options, "destroy");
         Instance?.Dispose();
         if (Module is not null)
         {
@@ -175,13 +205,15 @@ public partial class Capture : IAsyncDisposable
     /// <summary>
     /// 截屏
     /// </summary>
-    public virtual async Task Start() => await Start(null, null, null);
-
+    public virtual async Task Start() => await Start(null);
+    public virtual async Task Apply() => await Start(cmd: Command??"apply");
+    public virtual async Task Restart() => await Start(cmd: Command??"restart");
+    public virtual async Task Decode() => await Start(cmd: Command??"decode");
 
     /// <summary>
     /// 截屏
     /// </summary>
-    public virtual async Task Start(bool? continuous, bool? camera, bool? debug)
+    public virtual async Task Start(bool? continuous= null, bool? camera = null, bool? debug = null, EnmuCaptureEffect? effect=null, string? cmd=null)
     {
         try
         {
@@ -193,7 +225,8 @@ public partial class Capture : IAsyncDisposable
             Options.Width = Width;
             Options.Height = Height;
             Options.DeviceID = DeviceID;
-            await Module!.InvokeVoidAsync("Capture", Instance, Element, Options, "Start");
+            Options.Effect = effect ?? Options.Effect;
+            await Module!.InvokeVoidAsync("Capture", Instance, Element, Options, cmd??"start");
         }
         catch (Exception e)
         {
@@ -255,6 +288,17 @@ public partial class Capture : IAsyncDisposable
         var bytes = Convert.FromBase64String(base64Data);
         var stream = new MemoryStream(bytes);
         return stream;
+    }
+
+    /// <summary>
+    /// 错误回调方法
+    /// </summary>
+    /// <param name="error"></param>
+    /// <returns></returns>
+    [JSInvokable]
+    public async Task GetDecode(string val)
+    {
+        if (OnDecode != null) await OnDecode.Invoke(val);
     }
 
     /// <summary>

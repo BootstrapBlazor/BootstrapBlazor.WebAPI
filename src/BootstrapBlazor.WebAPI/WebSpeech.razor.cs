@@ -6,6 +6,7 @@
 
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
+using System.Diagnostics.CodeAnalysis;
 
 namespace BootstrapBlazor.Components;
 
@@ -19,7 +20,10 @@ namespace BootstrapBlazor.Components;
 /// </summary>
 public partial class WebSpeech : IAsyncDisposable
 {
-    [Inject] private IJSRuntime? JSRuntime { get; set; }
+    [Inject]
+    [NotNull]
+    private IJSRuntime? JSRuntime { get; set; }
+
     private IJSObjectReference? Module { get; set; }
     private DotNetObjectReference<WebSpeech>? Instance { get; set; }
 

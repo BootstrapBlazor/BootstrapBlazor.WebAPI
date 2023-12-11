@@ -7,6 +7,7 @@
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
 using System.Text.Json.Serialization;
 
 namespace BootstrapBlazor.Components;
@@ -22,7 +23,10 @@ namespace BootstrapBlazor.Components;
 /// </summary>
 public partial class WebSerial : IAsyncDisposable
 {
-    [Inject] private IJSRuntime? JSRuntime { get; set; }
+    [Inject]
+    [NotNull]
+    private IJSRuntime? JSRuntime { get; set; }
+
     private IJSObjectReference? Module { get; set; }
     private DotNetObjectReference<WebSerial>? Instance { get; set; }
 
