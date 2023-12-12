@@ -206,9 +206,10 @@ public partial class Capture : IAsyncDisposable
     /// 截屏
     /// </summary>
     public virtual async Task Start() => await Start(null);
-    public virtual async Task Apply() => await Start(cmd: Command??"apply");
-    public virtual async Task Restart() => await Start(cmd: Command??"restart");
-    public virtual async Task Decode() => await Start(cmd: Command??"decode");
+    public virtual async Task Exec(string? cmd = null) => await Start(cmd: cmd ?? "apply");
+    public virtual async Task Apply(string? cmd = null) => await Start(cmd: cmd ?? "apply");
+    public virtual async Task Restart() => await Start(cmd: "restart");
+    public virtual async Task Decode() => await Start(cmd: "decode");
 
     /// <summary>
     /// 截屏

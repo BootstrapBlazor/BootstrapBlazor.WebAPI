@@ -19,6 +19,8 @@ let decodeTimer = false;
 let codeReaderImage = null;
 let supportsVibrate = false;
 let tryInvertColors = 0;
+let luminance = 60; // 调节参数
+
 export function vibrate() {
     if (supportsVibrate) navigator.vibrate(1000);
 }
@@ -34,6 +36,13 @@ export function Capture(instance, element, opt, command) {
         quality = options.quality;
     }
 
+    if (command == 'addluminance' && (options.effect == 5 || options.effect == 6)) {
+        luminance += 10;
+        if (luminance > 255) luminance = 10;
+    } else if (command == 'reduceluminance' && (options.effect == 5 || options.effect == 6)) {
+        luminance -= 10;
+        if (luminance <= 0) luminance = 10;
+    }
     if (command == 'start') {
         startup();
     } else if (command == 'takepicture') {
@@ -89,6 +98,7 @@ export function Capture(instance, element, opt, command) {
         decodeTimer = false;
         codeReaderImage = null;
         tryInvertColors = 0;
+        luminance = 60;
     }
 
     function startup() {
@@ -174,6 +184,9 @@ export function Capture(instance, element, opt, command) {
                         video.play();
 
                         if (options.effectPreview) {
+                            var inv = 100;
+                            if (options.effect == 8 || options.effect == 11) inv = 2000;
+
                             timmer = true;
                             // 每 100 毫秒将视频流绘制到画布上
                             var interval = setInterval(() => {
@@ -182,7 +195,7 @@ export function Capture(instance, element, opt, command) {
                                     clearInterval(interval);
                                     return;
                                 }
-                            }, 100);
+                            }, inv);
                         }
 
                         if (selectedDeviceId == null) {
@@ -322,7 +335,8 @@ export function Capture(instance, element, opt, command) {
             if (options.effect > 0) {
                 const imgData = context.getImageData(0, 0, canvas.width, canvas.height);
                 const data = imgData.data;
-                let luminance = 60 // 调节参数
+                const width = imgData.width
+                const height = imgData.height
                 for (var i = 0; i < data.length; i += 4) {
                     if (options.effect == 1) {
                         //反色
@@ -385,18 +399,84 @@ export function Capture(instance, element, opt, command) {
                         data[i + 3] -= 100 // a通道，设置不透明度
                     }
                     else if (options.effect == 8) {
-                        //模糊
-                        const n = 30 // 模糊程度
-                        const m = 1 / (n * n)
-                        const matrix = []
-                        for (let i = 0; i < n * n; i++) {
-                            matrix.push(m)
-                        }
-                        const r = data[i + 0]
-                        const g = data[i + 1]
-                        const b = data[i + 2]
-                        const avg = (r + g + b) / 3
-                        data[i + 0] = data[i + 1] = data[i + 2] = avg >= 128 ? 255 : 0
+                        //模糊, 需要工作线程处理, 否则卡顿
+                        //    const gaussMatrix = []
+
+                        //    let gaussSum = 0
+                        //    let x = 0
+                        //    let y = 0
+
+                        //    let i = 0
+                        //    let j = 0
+                        //    let k = 0
+                        //    let len = 0
+
+                        //    const radius = 10
+                        //    const sigma = 5
+
+                        //    let r = 0
+                        //    let g = 0
+                        //    let b = -1 / (2 * sigma * sigma)
+                        //    let a = 1 / (Math.sqrt(2 * Math.PI) * sigma)
+
+                        //    // 生成高斯矩阵
+                        //    for (i = 0, x = -radius; x <= radius; x++, i++) {
+                        //        g = a * Math.exp(b * x * x)
+                        //        gaussMatrix[i] = g
+                        //        gaussSum += g
+                        //    }
+
+                        //    // 归一化, 保证高斯矩阵的值在[0,1]之间
+                        //    for (i = 0, len = gaussMatrix.length; i < len; i++) {
+                        //        gaussMatrix[i] /= gaussSum
+                        //    }
+
+                        //    // x 方向一维高斯运算
+                        //    for (y = 0; y < height; y++) {
+                        //        for (x = 0; x < width; x++) {
+                        //            r = g = b = a = 0
+                        //            gaussSum = 0
+                        //            for (j = -radius; j <= radius; j++) {
+                        //                k = x + j
+                        //                if (k >= 0 && k < width) { // 确保 k 没超出 x 的范围
+                        //                    // r,g,b,a 四个一组
+                        //                    i = (y * width + k) * 4
+                        //                    r += data[i] * gaussMatrix[j + radius]
+                        //                    g += data[i + 1] * gaussMatrix[j + radius]
+                        //                    b += data[i + 2] * gaussMatrix[j + radius]
+                        //                    gaussSum += gaussMatrix[j + radius]
+                        //                }
+                        //            }
+                        //            i = (y * width + x) * 4
+                        //            // 除以 gaussSum 是为了消除处于边缘的像素, 高斯运算不足的问题
+                        //            // console.log(gaussSum)
+                        //            data[i] = r / gaussSum
+                        //            data[i + 1] = g / gaussSum
+                        //            data[i + 2] = b / gaussSum
+                        //        }
+                        //    }
+
+                        //    // y 方向一维高斯运算
+                        //    for (x = 0; x < width; x++) {
+                        //        for (y = 0; y < height; y++) {
+                        //            r = g = b = a = 0
+                        //            gaussSum = 0
+                        //            for (j = -radius; j <= radius; j++) {
+                        //                k = y + j
+                        //                if (k >= 0 && k < height) { // 确保 k 没超出 y 的范围
+                        //                    i = (k * width + x) * 4
+                        //                    r += data[i] * gaussMatrix[j + radius]
+                        //                    g += data[i + 1] * gaussMatrix[j + radius]
+                        //                    b += data[i + 2] * gaussMatrix[j + radius]
+                        //                    gaussSum += gaussMatrix[j + radius]
+                        //                }
+                        //            }
+                        //            i = (y * width + x) * 4
+                        //            data[i] = r / gaussSum
+                        //            data[i + 1] = g / gaussSum
+                        //            data[i + 2] = b / gaussSum
+                        //        }
+                        //    }
                     }
                     else if (options.effect == 9) {
                         //RGB蒙版
@@ -405,7 +485,36 @@ export function Capture(instance, element, opt, command) {
                         //老照片滤镜
                     }
                     else if (options.effect == 11) {
-                        //马赛克
+                        //马赛克, 需要工作线程处理, 否则卡顿
+                        //const blur = 6 // 马赛克范围
+                        //const blurR = 2 * blur + 1
+                        //const total = blurR * blurR
+
+                        //for (let i = blur; i <= width; i = i + blurR) {
+                        //    for (let j = blur; j <= height; j = j + blurR) {
+                        //        let r = 0
+                        //        let g = 0
+                        //        let b = 0
+                        //        for (let leny = -blur; leny <= blur; leny++) {
+                        //            for (let lenx = -blur; lenx <= blur; lenx++) {
+                        //                r += data[4 * ((j + leny) * width + i + lenx) + 0]
+                        //                g += data[4 * ((j + leny) * width + i + lenx) + 1]
+                        //                b += data[4 * ((j + leny) * width + i + lenx) + 2]
+                        //            }
+                        //        }
+
+                        //        let vr = r / total
+                        //        let vg = g / total
+                        //        let vb = b / total
+                        //        for (let leny = -blur; leny <= blur; leny++) {
+                        //            for (let lenx = -blur; lenx <= blur; lenx++) {
+                        //                data[4 * ((j + leny) * width + i + lenx) + 0] = vr
+                        //                data[4 * ((j + leny) * width + i + lenx) + 1] = vg
+                        //                data[4 * ((j + leny) * width + i + lenx) + 2] = vb
+                        //            }
+                        //        }
+                        //    }
+                        //} 
                     }
                     else if (options.effect == 12) {
                         //RGB通道_红

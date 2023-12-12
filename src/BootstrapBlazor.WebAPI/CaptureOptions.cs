@@ -70,7 +70,7 @@ public class CaptureOptions
     /// 图像效果
     /// </summary>
     [DisplayName("图像效果")]
-    public EnmuCaptureEffect Effect { get; set; }= EnmuCaptureEffect.None;
+    public EnmuCaptureEffect Effect { get; set; }= EnmuCaptureEffect.无;
 
 }
 
@@ -90,7 +90,7 @@ public enum EnmuCaptureEffect
 {
     //https://juejin.cn/post/7119893640264024071
 
-    None,
+    无,
 
     反色,
 
